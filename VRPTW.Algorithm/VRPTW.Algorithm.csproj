@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VRPTW.Data\VRPTW.Data.csproj" />
+    <ProjectReference Include="..\VRPTW.Helper\VRPTW.Helper.csproj" />
+    <ProjectReference Include="..\VRPTW.Model\VRPTW.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="gurobi81.netstandard20">
+      <HintPath>..\..\..\..\..\..\gurobi811\win64\lib\gurobi81.netstandard20.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
