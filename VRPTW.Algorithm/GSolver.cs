@@ -148,7 +148,7 @@ namespace VRPTW.Algorithm
                 {
                     _model.AddConstr(_vehicleTraverse[v][s][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_S");
                     _model.AddConstr(_vehicleTraverse[v][s][0], GRB.EQUAL, 0.0, "_UnAllowedTraverses_0");
-                    _model.AddConstr(_vehicleTraverse[v][s][_numberOfVertices - 1], GRB.EQUAL, 0.0, "_UnAllowedTraverses_N+1");
+                    _model.AddConstr(_vehicleTraverse[v][_numberOfVertices - 1][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_N+1");
                 }
             }
         }
@@ -274,17 +274,20 @@ namespace VRPTW.Algorithm
         {
             for (int v = 0; v < _numberOfVehicles; v++)
             {
-                var route = new List<string>();
+                var route = new List<string>() { "0" };
+                var currentVertex = 0;
                 for (int s = 0; s < _numberOfVertices; s++)
                 {
                     for (int e = 0; e < _numberOfVertices; e++)
                     {
-                        if (Math.Round(_vehicleTraverse[v][s][e].Get(GRB.DoubleAttr.X)) == 1.0)
+                        if (Math.Round(_vehicleTraverse[v][currentVertex][e].Get(GRB.DoubleAttr.X)) == 1.0)
                         {
                             route.Add(_vertices[e].Name);
+                            currentVertex = e;
                         }
                     }
                 }
+                Console.Write("Vehicle {0}: ", v + 1);
                 foreach (var c in route)
                 {
                     Console.Write(c + " ");
