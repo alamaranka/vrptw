@@ -15,9 +15,9 @@ namespace VRPTW.Data
 
         public XMLReader()
         {
-            Config config = new Config();
-            _filePath = config.GetFileOperations().FilePath;
-            _fileName = config.GetFileOperations().FileName;
+            var config = new Config().GetFileOperations();
+            _filePath = config.FilePath;
+            _fileName = config.FileName;
             _doc = XDocument.Load(_filePath + _fileName);
         }
 

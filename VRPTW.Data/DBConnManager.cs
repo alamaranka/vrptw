@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Text;
+using VRPTW.Configuration;
 
 namespace VRPTW.Data
 {
@@ -8,12 +9,6 @@ namespace VRPTW.Data
     {
         private SqlConnection _conn = null;
         private static DBConnManager _connInstance = new DBConnManager();
-
-        private static readonly string DNS = "";
-        private static readonly string PORT = "";
-        private static readonly string DBNAME = "";
-        private static readonly string USERNAME = "";
-        private static readonly string PASSWORD = "";
 
         public static DBConnManager GetInstance()
         {
@@ -26,11 +21,12 @@ namespace VRPTW.Data
 
         private string GenerateConnectionString()
         {
+            var config = new Config().GetConnectionString();
             StringBuilder connectionString = new StringBuilder();
-            connectionString.Append("Data Source=").Append(DNS).Append(",").Append(PORT).Append(";");
-            connectionString.Append("Initial Catalog=").Append(DBNAME).Append(";");
-            connectionString.Append("User Id=").Append(USERNAME).Append(";");
-            connectionString.Append("Password=").Append(PASSWORD).Append(";");
+            connectionString.Append("Data Source=").Append(config.DNS).Append(",").Append(config.Port).Append(";");
+            connectionString.Append("Initial Catalog=").Append(config.DBName).Append(";");
+            connectionString.Append("User Id=").Append(config.Username).Append(";");
+            connectionString.Append("Password=").Append(config.Password).Append(";");
             return connectionString.ToString();
         }
 

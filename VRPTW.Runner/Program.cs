@@ -8,8 +8,8 @@ namespace VRPTW.Runner
     {
         static void Main(string[] args)
         {
-            var config = new Config();
-            new GSolver(config.GetSolverParameters()).Run();
+            var config = new Config().GetSolverParameters();
+            new GSolver(config).Run();
             Console.ReadLine();
         }  
     }
