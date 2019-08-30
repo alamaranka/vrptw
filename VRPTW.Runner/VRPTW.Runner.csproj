@@ -7,7 +7,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VRPTW.Algorithm\VRPTW.Algorithm.csproj" />
+    <ProjectReference Include="..\VRPTW.Configuration\VRPTW.Configuration.csproj" />
     <ProjectReference Include="..\VRPTW.Data\VRPTW.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace VRPTW.Configuration
 {
-    class SolverParameters
+    public class SolverParameters
     {
+        public string Source { get; set; }
         public double TimeLimit { get; set; }
         public double MIPGap { get; set; }
         public int Threads { get; set; }

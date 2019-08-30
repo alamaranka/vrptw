@@ -1,6 +1,6 @@
 ﻿using System;
 using VRPTW.Algorithm;
-using VRPTW.Data;
+using VRPTW.Configuration;
 
 namespace VRPTW.Runner
 {
@@ -8,11 +8,9 @@ namespace VRPTW.Runner
     {
         static void Main(string[] args)
         {
-            //TODO: consider appsettings.json for config
-            var source = "xml"; var timeLimit = 120.0; var mipGap = 0.05;
-            new GSolver("xml", timeLimit, mipGap).Run();
-            if (source.Equals("database")) { new DBConnManager().Close(); }
+            var config = new Config();
+            new GSolver(config.GetSolverParameters()).Run();
             Console.ReadLine();
-        }
+        }  
     }
 }

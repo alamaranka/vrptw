@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace VRPTW.Configuration
 {
-    class ConnectionString
+    public class ConnectionString
     {
         public string DNS { get; set; }
         public string Port { get; set; }

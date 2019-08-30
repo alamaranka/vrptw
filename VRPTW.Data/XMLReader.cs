@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
+using VRPTW.Configuration;
 using VRPTW.Model;
 
 namespace VRPTW.Data
 {
     public class XMLReader
     {
-        private static readonly string _filePath = "";
-        private static readonly string _fileName = "";
-        private XDocument _doc;
+        private readonly string _filePath;
+        private readonly string _fileName;
+        private readonly XDocument _doc;
 
         public XMLReader()
         {
+            Config config = new Config();
+            _filePath = config.GetFileOperations().FilePath;
+            _fileName = config.GetFileOperations().FileName;
             _doc = XDocument.Load(_filePath + _fileName);
         }
 

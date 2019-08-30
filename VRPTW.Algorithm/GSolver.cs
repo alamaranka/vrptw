@@ -1,7 +1,7 @@
 ﻿using Gurobi;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Helper;
 using VRPTW.Model;
@@ -28,12 +28,14 @@ namespace VRPTW.Algorithm
         private readonly string _dataSource;
         private readonly double _timeLimit;
         private readonly double _mipGap;
+        private readonly int _threads;
 
-        public GSolver(string dataSource, double timeLimit, double mipGap)
+        public GSolver(SolverParameters solverParameters)
         {
-            _dataSource = dataSource;
-            _timeLimit = timeLimit;
-            _mipGap = mipGap;
+            _dataSource = solverParameters.Source;
+            _timeLimit = solverParameters.TimeLimit;
+            _mipGap = solverParameters.MIPGap;
+            _threads = solverParameters.Threads;
         }
 
         public void Run()
@@ -53,7 +55,7 @@ namespace VRPTW.Algorithm
         {
             switch (_dataSource)
             {
-                case "database":
+                case "database": //TODO: new DBConnManager().Close(); if used
                     var dBReader = new DBReader();
                     _vertices = dBReader.GetVertices();
                     _vehicles = dBReader.GetVehicles();
@@ -82,6 +84,7 @@ namespace VRPTW.Algorithm
         {
             _model.Parameters.TimeLimit = _timeLimit;
             _model.Parameters.MIPGap = _mipGap;
+            _model.Parameters.Threads = _threads;
         }
 
         private void InitializeDecisionVariables()

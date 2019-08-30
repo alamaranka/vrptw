@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VRPTW.Configuration\VRPTW.Configuration.csproj" />
     <ProjectReference Include="..\VRPTW.Model\VRPTW.Model.csproj" />
   </ItemGroup>
 

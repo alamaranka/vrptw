@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -78,6 +77,7 @@ namespace VRPTW.Data
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
             }
         }
     }
