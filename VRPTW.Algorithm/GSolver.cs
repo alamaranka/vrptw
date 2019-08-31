@@ -277,7 +277,8 @@ namespace VRPTW.Algorithm
         {
             for (int v = 0; v < _numberOfVehicles; v++)
             {
-                var route = new List<string>() { "0" };
+                var customer = new List<string>() { "0" };
+                var serviceTime = new List<double>() { Math.Round(_serviceStart[v][0].Get(GRB.DoubleAttr.X), 0) };
                 var currentVertex = 0;
                 for (int s = 0; s < _numberOfVertices; s++)
                 {
@@ -285,15 +286,16 @@ namespace VRPTW.Algorithm
                     {
                         if (Math.Round(_vehicleTraverse[v][currentVertex][e].Get(GRB.DoubleAttr.X)) == 1.0)
                         {
-                            route.Add(_vertices[e].Name);
+                            customer.Add(_vertices[e].Name);
+                            serviceTime.Add(Math.Round(_serviceStart[v][e].Get(GRB.DoubleAttr.X), 0));
                             currentVertex = e;
                         }
                     }
                 }
                 Console.Write("Vehicle {0}: ", v + 1);
-                foreach (var c in route)
+                for (var r = 0; r < customer.Count; r++ )
                 {
-                    Console.Write(c + " ");
+                    Console.Write("({0} at {1}) ", customer[r], serviceTime[r]);
                 }
                 Console.WriteLine();
             }
