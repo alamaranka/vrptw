@@ -55,7 +55,7 @@ namespace VRPTW.Algorithm
         {
             switch (_dataSource)
             {
-                case "database": //TODO: new DBConnManager().Close(); if used
+                case "database": //TODO:  if used make sure: new DBConnManager().Close();
                     var dBReader = new DBReader();
                     _vertices = dBReader.GetVertices();
                     _vehicles = dBReader.GetVehicles();
@@ -292,12 +292,15 @@ namespace VRPTW.Algorithm
                         }
                     }
                 }
-                Console.Write("Vehicle {0}: ", v + 1);
-                for (var r = 0; r < customer.Count; r++ )
+                if (customer.Count > 2)
                 {
-                    Console.Write("({0} at {1}) ", customer[r], serviceTime[r]);
+                    Console.Write("Vehicle {0}: ", v + 1);
+                    for (var r = 0; r < customer.Count; r++)
+                    {
+                        Console.Write("({0} at {1}) ", customer[r], serviceTime[r]);
+                    }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
             }
         }
 
