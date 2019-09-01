@@ -14,9 +14,12 @@ namespace VRPTW.Heuristics
         private List<Vehicle> _vehicles;
         private List<Customer> _customers;
         private List<Customer> _unRoutedCustomers;
+        private double _routeMaxCapacity;
 
         public List<Route> Routes { get; set; }
+
         public double Cost { get; set; }
+
         private InitialSolution() { }
 
         public InitialSolution(Dataset dataset)
@@ -31,6 +34,7 @@ namespace VRPTW.Heuristics
             _depot = _customers[0];
             _customers.RemoveAt(0);
             _unRoutedCustomers = _customers.ToList();
+            _routeMaxCapacity = _vehicles[0].Capacity;
         }
 
         public InitialSolution Get()
@@ -39,29 +43,12 @@ namespace VRPTW.Heuristics
             var routes = new List<Route>();
             while (_unRoutedCustomers.Count > 0)
             {
-                routes.Add(new RouteGenerator(_unRoutedCustomers).Generate());
+                routes.Add(new RouteGenerator(_depot, _unRoutedCustomers, _routeMaxCapacity)._route);
             }
             return new InitialSolution() {
                 Routes = routes,
                 Cost = CalculateCost(routes)
             };
-        }
-
-        private Customer GetSeedCustomer()
-        {
-            var maxDistance = 0.0;
-            var seedCustomer = new Customer();
-            foreach (var customer in _unRoutedCustomers)
-            {
-                var distance = DistanceCalculator.Calculate(_depot, customer);
-                if (distance > maxDistance)
-                {
-                    maxDistance = distance;
-                    seedCustomer = customer;
-                }
-            }
-            _unRoutedCustomers.Remove(seedCustomer);
-            return seedCustomer;
         }
 
         private double CalculateCost(List<Route> routes)

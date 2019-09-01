@@ -12,7 +12,8 @@ namespace VRPTW.Runner
         {
             var dataSource = Config.GetDataSource();
             var dataset = new DataPreparer(dataSource).GetCustomerAndVehicleData();
-            new GSolver(dataset).Run();
+            //new GSolver(dataset).Run();
+            new InitialSolution(dataset).Get();
             Console.ReadLine();
         }  
     }

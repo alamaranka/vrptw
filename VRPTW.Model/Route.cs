@@ -7,7 +7,7 @@ namespace VRPTW.Model
     public class Route
     {
         public List<Customer> Customers { get; set; }
-        public int Distance { get; set; }
-        public int Duration { get; set; }
+        public double Capacity { get; set; }
+        public double Distance { get; set; }
     }
 }
