@@ -10,5 +10,7 @@ namespace VRPTW.Model
         public int TimeStart { get; set; }
         public int TimeEnd { get; set; }
         public int ServiceTime { get; set; }
+        public int ServiceStartTime { get; set; }
+        public Route RoutePlanned { get; set; }
     }
 }

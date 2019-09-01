@@ -9,6 +9,7 @@
     <ProjectReference Include="..\VRPTW.Algorithm\VRPTW.Algorithm.csproj" />
     <ProjectReference Include="..\VRPTW.Configuration\VRPTW.Configuration.csproj" />
     <ProjectReference Include="..\VRPTW.Data\VRPTW.Data.csproj" />
+    <ProjectReference Include="..\VRPTW.Heuristics\VRPTW.Heuristics.csproj" />
   </ItemGroup>
 
   <ItemGroup>

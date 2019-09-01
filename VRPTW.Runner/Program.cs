@@ -1,6 +1,8 @@
 ﻿using System;
 using VRPTW.Algorithm;
 using VRPTW.Configuration;
+using VRPTW.Data;
+using VRPTW.Heuristics;
 
 namespace VRPTW.Runner
 {
@@ -8,8 +10,9 @@ namespace VRPTW.Runner
     {
         static void Main(string[] args)
         {
-            var config = new Config().GetSolverParameters();
-            new GSolver(config).Run();
+            var dataSource = Config.GetDataSource();
+            var dataset = new DataPreparer(dataSource).GetCustomerAndVehicleData();
+            new GSolver(dataset).Run();
             Console.ReadLine();
         }  
     }

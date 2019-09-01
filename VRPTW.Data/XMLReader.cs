@@ -9,23 +9,19 @@ namespace VRPTW.Data
 {
     public class XMLReader
     {
-        private readonly string _filePath;
-        private readonly string _fileName;
         private readonly XDocument _doc;
 
         public XMLReader()
         {
-            var config = new Config().GetFileOperations();
-            _filePath = config.FilePath;
-            _fileName = config.FileName;
-            _doc = XDocument.Load(_filePath + _fileName);
+            _doc = XDocument.Load(Config.GetFileOperation().FilePath +
+                                  Config.GetFileOperation().FileName);
         }
 
         public List<Customer> GetVertices()
         {
             var vertices = new List<Customer>();
             var name = _doc.Descendants("node").Select(c => c.Attribute("id").Value).ToList();
-            var latidute = _doc.Descendants("cx").Select(x => x.Value).ToList();
+            var latitude = _doc.Descendants("cx").Select(x => x.Value).ToList();
             var longitude = _doc.Descendants("cy").Select(c => c.Value).ToList();
             var demand = _doc.Descendants("quantity").Select(c => c.Value).ToList();
             var timeStart = _doc.Descendants("start").Select(c => c.Value).ToList();
@@ -42,7 +38,7 @@ namespace VRPTW.Data
                 var customer = new Customer
                 {
                     Name = (string)name[record],
-                    Latitude = (int)Convert.ToDouble(latidute[record]),
+                    Latitude = (int)Convert.ToDouble(latitude[record]),
                     Longitude = (int)Convert.ToDouble(longitude[record]),
                     Demand = (int)Convert.ToDouble(demand[record]),
                     TimeStart = (int)Convert.ToDouble(timeStart[record]),
@@ -51,7 +47,6 @@ namespace VRPTW.Data
                 };
                 vertices.Add(customer);
             }
-            vertices.Add(vertices[0]);
             return vertices;
         }
 

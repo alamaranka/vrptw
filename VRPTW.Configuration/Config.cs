@@ -2,36 +2,59 @@
 
 namespace VRPTW.Configuration
 {
-    public class Config
+    public static class Config
     {
-        public ConnectionString GetConnectionString()
+        public static string GetDataSource()
+        {
+            return ConfigManager.AppSetting["DataSource"];
+        }
+
+        public static ConnectionString GetConnectionString()
         {
             return new ConnectionString()
             {
-                DNS = ConfigManager.AppSetting["ConfigurationManager:DNS"],
-                Port = ConfigManager.AppSetting["ConfigurationManager:Port"],
-                DBName = ConfigManager.AppSetting["ConfigurationManager:DBName"],
-                Username = ConfigManager.AppSetting["ConfigurationManager:Username"],
-                Password = ConfigManager.AppSetting["ConfigurationManager:Password"]
+                DNS = ConfigManager.AppSetting["ConnectionString:DNS"],
+                Port = ConfigManager.AppSetting["ConnectionString:Port"],
+                DBName = ConfigManager.AppSetting["ConnectionString:DBName"],
+                Username = ConfigManager.AppSetting["ConnectionString:Username"],
+                Password = ConfigManager.AppSetting["ConnectionString:Password"]
             };
         }
-        public FileOperations GetFileOperations()
+        public static FileOperation GetFileOperation()
         {
-            return new FileOperations()
+            return new FileOperation()
             {
-                FilePath = ConfigManager.AppSetting["FileOperations:FilePath"],
-                FileName = ConfigManager.AppSetting["FileOperations:FileName"]
+                FilePath = ConfigManager.AppSetting["FileOperation:FilePath"],
+                FileName = ConfigManager.AppSetting["FileOperation:FileName"]
             };
         }
 
-        public SolverParameters GetSolverParameters()
+        public static SolverParam GetSolverParam()
         {
-            return new SolverParameters()
+            return new SolverParam()
             {
-                Source = ConfigManager.AppSetting["SolverParameters:Source"],
-                TimeLimit = Convert.ToDouble(ConfigManager.AppSetting["SolverParameters:TimeLimit"]),
-                MIPGap = Convert.ToDouble(ConfigManager.AppSetting["SolverParameters:MIPGap"]),
-                Threads = (int)Convert.ToDouble(ConfigManager.AppSetting["SolverParameters:Threads"])
+                TimeLimit = Convert.ToDouble(ConfigManager.AppSetting["SolverParam:TimeLimit"]),
+                MIPGap = Convert.ToDouble(ConfigManager.AppSetting["SolverParam:MIPGap"]),
+                Threads = (int)Convert.ToDouble(ConfigManager.AppSetting["SolverParam:Threads"])
+            };
+        }
+
+        public static HeuristicsParam GetHeuristicsParam()
+        {
+            return new HeuristicsParam()
+            {
+                InitialSolutionParam = GetInitialSolutionParam()
+            };
+        }
+
+        public static InitialSolutionParam GetInitialSolutionParam()
+        {
+            return new InitialSolutionParam()
+            {
+                Alpha1 = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:InitialSolutionParam:Alpha1"]),
+                Alpha2 = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:InitialSolutionParam:Alpha2"]),
+                Mu = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:InitialSolutionParam:Mu"]),
+                Lambda = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:InitialSolutionParam:Lambda"])
             };
         }
     }

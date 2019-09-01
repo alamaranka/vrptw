@@ -5,28 +5,28 @@ using VRPTW.Configuration;
 
 namespace VRPTW.Data
 {
-    public class DBConnManager
+    public class DBManager
     {
         private SqlConnection _conn = null;
-        private static DBConnManager _connInstance = new DBConnManager();
+        private static DBManager _connInstance = new DBManager();
 
-        public static DBConnManager GetInstance()
+        public static DBManager GetInstance()
         {
             if (_connInstance == null)
             {
-                _connInstance = new DBConnManager();
+                _connInstance = new DBManager();
             }
             return _connInstance;
         }
 
         private string GenerateConnectionString()
         {
-            var config = new Config().GetConnectionString();
             StringBuilder connectionString = new StringBuilder();
-            connectionString.Append("Data Source=").Append(config.DNS).Append(",").Append(config.Port).Append(";");
-            connectionString.Append("Initial Catalog=").Append(config.DBName).Append(";");
-            connectionString.Append("User Id=").Append(config.Username).Append(";");
-            connectionString.Append("Password=").Append(config.Password).Append(";");
+            connectionString.Append("Data Source=").Append(Config.GetConnectionString().DNS).Append(",")
+                                                   .Append(Config.GetConnectionString().Port).Append(";");
+            connectionString.Append("Initial Catalog=").Append(Config.GetConnectionString().DBName).Append(";");
+            connectionString.Append("User Id=").Append(Config.GetConnectionString().Username).Append(";");
+            connectionString.Append("Password=").Append(Config.GetConnectionString().Password).Append(";");
             return connectionString.ToString();
         }
 

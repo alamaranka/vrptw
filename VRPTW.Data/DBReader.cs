@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using VRPTW.Configuration;
 using VRPTW.Model;
 
 namespace VRPTW.Data
 {
     public class DBReader
     {
-        private readonly SqlConnection _conn = DBConnManager.GetInstance().GetConnection();
+        private readonly SqlConnection _conn = DBManager.GetInstance().GetConnection();
         private SqlDataAdapter _sqlDataAdapter;
 
         public List<Customer> GetVertices()
@@ -33,7 +34,6 @@ namespace VRPTW.Data
                 };
                 vertices.Add(customer);
             }
-            vertices.Add(vertices[0]);
             return vertices;
         }
 

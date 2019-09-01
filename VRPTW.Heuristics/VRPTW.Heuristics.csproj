@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VRPTW.Data\VRPTW.Data.csproj" />
+    <ProjectReference Include="..\VRPTW.Helper\VRPTW.Helper.csproj" />
+  </ItemGroup>
+
+</Project>

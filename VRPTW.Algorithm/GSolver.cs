@@ -13,6 +13,7 @@ namespace VRPTW.Algorithm
         private GRBEnv _env;
         private GRBModel _model;
         private int _status;
+        private Dataset _dataset;
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
         private List<List<List<GRBVar>>> _vehicleTraverse;
@@ -25,17 +26,16 @@ namespace VRPTW.Algorithm
         private GRBLinExpr _cost;
 
         private const int BIGM = 1_000;
-        private readonly string _dataSource;
         private readonly double _timeLimit;
         private readonly double _mipGap;
         private readonly int _threads;
 
-        public GSolver(SolverParameters solverParameters)
+        public GSolver(Dataset dataset)
         {
-            _dataSource = solverParameters.Source;
-            _timeLimit = solverParameters.TimeLimit;
-            _mipGap = solverParameters.MIPGap;
-            _threads = solverParameters.Threads;
+            _dataset = dataset;
+            _timeLimit = Config.GetSolverParam().TimeLimit;
+            _mipGap = Config.GetSolverParam().MIPGap;
+            _threads = Config.GetSolverParam().Threads;
         }
 
         public void Run()
@@ -53,22 +53,9 @@ namespace VRPTW.Algorithm
 
         private void SetInputData()
         {
-            switch (_dataSource)
-            {
-                case "database": //TODO:  if used make sure: new DBConnManager().Close();
-                    var dBReader = new DBReader();
-                    _vertices = dBReader.GetVertices();
-                    _vehicles = dBReader.GetVehicles();
-                    break;
-                case "xml":
-                    XMLReader xMLReader = new XMLReader();
-                    _vertices = xMLReader.GetVertices();
-                    _vehicles = xMLReader.GetVehicles();
-                    break;
-                default:
-                    break;
-            }
-
+            _vertices = _dataset.Vertices;
+            _vertices.Add(_vertices[0]);
+            _vehicles = _dataset.Vehicles;
             _numberOfVertices = _vertices.Count;
             _numberOfCustomers = _vertices.Count - 2;
             _numberOfVehicles = _vehicles.Count;
