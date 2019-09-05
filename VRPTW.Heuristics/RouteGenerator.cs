@@ -43,7 +43,7 @@ namespace VRPTW.Heuristics
                                 .Add(InsertionValueOfCustomer(_route.Customers[p - 1], u, _route.Customers[p])); 
                         }
                     }
-                    if (insertionValueOfFeasibleCustomers.Count > 0) 
+                    if (feasibleCustomersToInsert.Count > 0) 
                     {
                         var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers.IndexOf(insertionValueOfFeasibleCustomers.Max());
                         var bestCustomerToInsert = feasibleCustomersToInsert[indexOfBestFeasibleCustomer];
@@ -110,9 +110,11 @@ namespace VRPTW.Heuristics
                 _route.Customers[p].ServiceStart = serviceStart;
                 if (serviceStart < _route.Customers[p].TimeStart || serviceStart > _route.Customers[p].TimeEnd)
                 {
+                    _route.Customers.Remove(candidate);
                     return false;
                 }
             }
+            _route.Customers.Remove(candidate);
             return true;
         }
 
