@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using VRPTW.Configuration;
-using VRPTW.Data;
-using VRPTW.Helper;
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
@@ -15,12 +12,6 @@ namespace VRPTW.Heuristics
         private List<Customer> _customers;
         private List<Customer> _unRoutedCustomers;
         private double _routeMaxCapacity;
-
-        public List<Route> Routes { get; set; }
-
-        public double Cost { get; set; }
-
-        private InitialSolution() { }
 
         public InitialSolution(Dataset dataset)
         {
@@ -37,15 +28,17 @@ namespace VRPTW.Heuristics
             _routeMaxCapacity = _vehicles[0].Capacity;
         }
 
-        public InitialSolution Get()
+        public Solution Get()
         {
             SetInputData();
             var routes = new List<Route>();
             while (_unRoutedCustomers.Count > 0)
             {
-                routes.Add(new RouteGenerator(_depot, _unRoutedCustomers, _routeMaxCapacity)._route);
+                var route = new RouteGenerator(_depot, _unRoutedCustomers, _routeMaxCapacity)._route;
+                routes.Add(route);
+                _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
-            return new InitialSolution() {
+            return new Solution() {
                 Routes = routes,
                 Cost = CalculateCost(routes)
             };
@@ -53,7 +46,12 @@ namespace VRPTW.Heuristics
 
         private double CalculateCost(List<Route> routes)
         {
-            return 0.0;
+            var cost = 0.0;
+            foreach (var route in routes)
+            {
+                cost += route.Distance;
+            }
+            return cost;
         }
     }
 }

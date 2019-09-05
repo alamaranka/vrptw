@@ -3,6 +3,7 @@ using VRPTW.Algorithm;
 using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Heuristics;
+using VRPTW.Model;
 
 namespace VRPTW.Runner
 {
@@ -12,9 +13,9 @@ namespace VRPTW.Runner
         {
             var dataSource = Config.GetDataSource();
             var dataset = new DataPreparer(dataSource).GetCustomerAndVehicleData();
+
             //new GSolver(dataset).Run();
-            new InitialSolution(dataset).Get();
-            Console.ReadLine();
+            Solution initialSolution = new InitialSolution(dataset).Get();
         }  
     }
 }
