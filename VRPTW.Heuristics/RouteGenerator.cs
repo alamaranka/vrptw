@@ -110,7 +110,6 @@ namespace VRPTW.Heuristics
                 _route.Customers[p].ServiceStart = serviceStart;
                 if (serviceStart < _route.Customers[p].TimeStart || serviceStart > _route.Customers[p].TimeEnd)
                 {
-                    //UpdateServiceTimes();
                     return false;
                 }
             }
