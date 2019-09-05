@@ -80,18 +80,6 @@ namespace VRPTW.Heuristics
             };
         }
 
-        private Route CloneRoute()
-        {
-            var route = new Route();
-            var customers = new List<Customer>();
-            foreach(var c in _route.Customers)
-            {
-                customers.Add(c);
-            }
-            route.Customers = customers;
-            return route;
-        }
-
         private void InsertCustomerToTheRoute(Customer previous, Customer candidate, Customer next)
         {
             _route.Customers.Insert(_route.Customers.IndexOf(previous) + 1, candidate);
