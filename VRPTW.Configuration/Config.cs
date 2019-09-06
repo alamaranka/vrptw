@@ -4,6 +4,10 @@ namespace VRPTW.Configuration
 {
     public static class Config
     {
+        public static string GetSolverType()
+        {
+            return ConfigManager.AppSetting["SolverType"];
+        }
         public static string GetDataSource()
         {
             return ConfigManager.AppSetting["DataSource"];

@@ -36,7 +36,7 @@ namespace VRPTW.Heuristics
                     var insertionValueOfFeasibleCustomers = new List<double>();
                     foreach (var u in _candidateCustomers)
                     {
-                        if (IsFeasibleToInsert(p, u)) 
+                        if (IsFeasibleToInsert(_route.Customers[p - 1], u, _route.Customers[p])) 
                         {
                             feasibleCustomersToInsert.Add(u);
                             insertionValueOfFeasibleCustomers
@@ -96,34 +96,37 @@ namespace VRPTW.Heuristics
             _candidateCustomers.Remove(candidate);
         }
         
-        private bool IsFeasibleToInsert(int insertionIndex, Customer candidate)
+        private bool IsFeasibleToInsert(Customer previous, Customer candidate, Customer next)
         {
             if (_route.Capacity + candidate.Demand > _routeMaxCapacity)
             {
                 return false;
             }
 
-            _route.Customers.Insert(insertionIndex, candidate);
-            for (var p = insertionIndex; p < _route.Customers.Count; p++)
+            if (CalculateServiceStart(previous, candidate) < candidate.TimeStart)
             {
-                var serviceStart = CalculateServiceStart(_route.Customers[p-1], _route.Customers[p]);
-                _route.Customers[p].ServiceStart = serviceStart;
-                if (serviceStart < _route.Customers[p].TimeStart || serviceStart > _route.Customers[p].TimeEnd)
+                return false;
+            }
+
+            var serviceTimeDifference = DistanceCalculator.Calculate(previous, next) -
+                                        DistanceCalculator.Calculate(previous, candidate) -
+                                        DistanceCalculator.Calculate(candidate, next);
+            for (var p = _route.Customers.IndexOf(next); p < _route.Customers.Count; p++)
+            {
+                var newServiceTime = _route.Customers[p].ServiceStart - serviceTimeDifference;
+                if (newServiceTime < _route.Customers[p].TimeStart || newServiceTime > _route.Customers[p].TimeEnd)
                 {
-                    _route.Customers.Remove(candidate);
                     return false;
                 }
             }
-            _route.Customers.Remove(candidate);
             return true;
         }
 
         private double CalculateServiceStart(Customer previous, Customer candidate)
         {
-            return Math.Max(previous.ServiceStart +
-                                   previous.ServiceTime +
-                                   DistanceCalculator.Calculate(previous, candidate),
-                                   candidate.TimeStart);
+            return previous.ServiceStart +
+                   previous.ServiceTime +
+                   DistanceCalculator.Calculate(previous, candidate);
         }
 
         private double InsertionValueOfCustomer(Customer previous, Customer candidate, Customer next)

@@ -1,6 +1,7 @@
 ﻿using Gurobi;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Helper;
@@ -30,6 +31,8 @@ namespace VRPTW.Algorithm
         private readonly double _mipGap;
         private readonly int _threads;
 
+        private Solution _solution = new Solution();
+
         public GSolver(Dataset dataset)
         {
             _dataset = dataset;
@@ -38,7 +41,7 @@ namespace VRPTW.Algorithm
             _threads = Config.GetSolverParam().Threads;
         }
 
-        public void Run()
+        public Solution Run()
         {
             SetInputData();
             InitializeEnvAndModel();
@@ -48,7 +51,7 @@ namespace VRPTW.Algorithm
             CreateObjective();
             CreateConstraints();
             Solve();
-            Output();
+            return Output();
         }
 
         private void SetInputData()
@@ -260,46 +263,54 @@ namespace VRPTW.Algorithm
             _status = _model.Status;
         }
 
-        private void PrintRoutes()
+        private Solution GenerateRoutes()
         {
+            var routes = new List<Route>();
             for (int v = 0; v < _numberOfVehicles; v++)
             {
-                var customer = new List<string>() { "0" };
-                var serviceTime = new List<double>() { Math.Round(_serviceStart[v][0].Get(GRB.DoubleAttr.X), 0) };
                 var currentVertex = 0;
                 for (int s = 0; s < _numberOfVertices; s++)
                 {
+                    var customers = new List<Customer>();
+                    _vertices[0].ServiceStart = _serviceStart[v][0].Get(GRB.DoubleAttr.X);
+                    customers.Add(_vertices[0]);
                     for (int e = 0; e < _numberOfVertices; e++)
                     {
                         if (Math.Round(_vehicleTraverse[v][currentVertex][e].Get(GRB.DoubleAttr.X)) == 1.0)
                         {
-                            customer.Add(_vertices[e].Name);
-                            serviceTime.Add(Math.Round(_serviceStart[v][e].Get(GRB.DoubleAttr.X), 0));
+                            _vertices[e].ServiceStart = _serviceStart[v][e].Get(GRB.DoubleAttr.X);
+                            customers.Add(_vertices[e]);
                             currentVertex = e;
                         }
                     }
-                }
-                if (customer.Count > 2)
-                {
-                    Console.Write("Vehicle {0}: ", v + 1);
-                    for (var r = 0; r < customer.Count; r++)
+                    if (customers.Count > 2)
                     {
-                        Console.Write("({0} at {1}) ", customer[r], serviceTime[r]);
+                        routes.Add(new Route()
+                        {
+                            Customers = customers,
+                            Distance = _model.ObjVal,
+                            Capacity = customers.Sum(x => x.Demand)
+                        }) ;
                     }
-                    Console.WriteLine();
                 }
             }
+            return new Solution()
+            {
+                Routes = routes,
+                Cost = _model.ObjVal
+            };
         }
 
-        private void Output()
+        private Solution Output()
         {
             if (_status == GRB.Status.INFEASIBLE || _status == GRB.Status.UNBOUNDED)
             {
                 Console.WriteLine("Infeasible or unbounded solution!");
+                return null;
             }
             else
             {
-                PrintRoutes();
+                return GenerateRoutes();
             }
         }
 
