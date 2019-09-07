@@ -9,5 +9,9 @@ namespace VRPTW.Model
         public List<Customer> Customers { get; set; }
         public double Capacity { get; set; }
         public double Distance { get; set; }
+        public Route Clone()
+        {
+            return this.MemberwiseClone() as Route;
+        }
     }
 }
