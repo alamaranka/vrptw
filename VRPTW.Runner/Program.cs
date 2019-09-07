@@ -1,5 +1,4 @@
-﻿using System;
-using VRPTW.Algorithm;
+﻿using VRPTW.Algorithm;
 using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Heuristics;
@@ -25,7 +24,7 @@ namespace VRPTW.Runner
                     break;
                 default:
                     break;
-            }           
-        }  
+            }
+        }
     }
 }

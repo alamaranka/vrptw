@@ -32,22 +32,24 @@ namespace VRPTW.Heuristics
 
                 for (var p = 1; p < _route.Customers.Count; p++)
                 {
+                    var previous = _route.Customers[p - 1];
+                    var next = _route.Customers[p];
                     var feasibleCustomersToInsert = new List<Customer>();
                     var insertionValueOfFeasibleCustomers = new List<double>();
-                    foreach (var u in _candidateCustomers)
+                    foreach (var candidate in _candidateCustomers)
                     {
-                        if (IsFeasibleToInsert(_route.Customers[p - 1], u, _route.Customers[p])) 
+                        if (IsFeasibleToInsert(previous, candidate, next))
                         {
-                            feasibleCustomersToInsert.Add(u);
+                            feasibleCustomersToInsert.Add(candidate);
                             insertionValueOfFeasibleCustomers
-                                .Add(InsertionValueOfCustomer(_route.Customers[p - 1], u, _route.Customers[p])); 
+                                .Add(InsertionValueOfCustomer(previous, candidate, next));
                         }
                     }
-                    if (feasibleCustomersToInsert.Count > 0) 
+                    if (feasibleCustomersToInsert.Count > 0)
                     {
                         var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers.IndexOf(insertionValueOfFeasibleCustomers.Max());
                         var bestCustomerToInsert = feasibleCustomersToInsert[indexOfBestFeasibleCustomer];
-                        InsertCustomerToTheRoute(_route.Customers[p - 1], bestCustomerToInsert, _route.Customers[p]);
+                        InsertCustomerToTheRoute(previous, bestCustomerToInsert, next);
                         anyFeasibleCustomer = true;
                     }
                 }
@@ -59,74 +61,70 @@ namespace VRPTW.Heuristics
         {
             _route = new Route()
             {
-                Customers = new List<Customer>() { _depot, CloneDepot() },
-                Capacity = 0.0,
+                Customers = new List<Customer>() { _depot, _depot.Clone() },
+                Load = 0.0,
                 Distance = 0.0
             };
             InsertCustomerToTheRoute(_route.Customers[0], GetSeedCustomer(), _route.Customers[1]);
         }
 
-        private Customer CloneDepot()
-        {
-            return new Customer()
-            {
-                Name = _depot.Name,
-                Latitude = _depot.Latitude,
-                Longitude = _depot.Longitude,
-                Demand = _depot.Demand,
-                TimeStart = _depot.TimeStart,
-                TimeEnd = _depot.TimeEnd,
-                ServiceTime = _depot.ServiceTime
-            };
-        }
-
         private void InsertCustomerToTheRoute(Customer previous, Customer candidate, Customer next)
         {
-            _route.Customers.Insert(_route.Customers.IndexOf(previous) + 1, candidate);
+            _route.Customers.Insert(_route.Customers.IndexOf(next), candidate);
             for (var p = _route.Customers.IndexOf(candidate); p < _route.Customers.Count; p++)
             {
                 _route.Customers[p].ServiceStart = CalculateServiceStart(_route.Customers[p - 1], _route.Customers[p]);
             }
-            _route.Capacity += candidate.Demand;
+            _route.Load += candidate.Demand;
             _route.Distance = _route.Distance -
-                                DistanceCalculator.Calculate(previous, next) +
-                                DistanceCalculator.Calculate(previous, candidate) +
-                                DistanceCalculator.Calculate(candidate, next);
+                              DistanceCalculator.Calculate(previous, next) +
+                              DistanceCalculator.Calculate(previous, candidate) +
+                              DistanceCalculator.Calculate(candidate, next);
             Console.WriteLine("Customer {0} inserted to the route between {1} and {2}", candidate.Name, previous.Name, next.Name);
             _candidateCustomers.Remove(candidate);
         }
-        
+
         private bool IsFeasibleToInsert(Customer previous, Customer candidate, Customer next)
         {
-            if (_route.Capacity + candidate.Demand > _routeMaxCapacity)
+            if (_route.Load + candidate.Demand > _routeMaxCapacity)
             {
                 return false;
             }
 
-            if (CalculateServiceStart(previous, candidate) < candidate.TimeStart)
+            var previousServiceTime = CalculateServiceStart(previous, candidate);
+            if (previousServiceTime < candidate.TimeStart || previousServiceTime > candidate.TimeEnd)
             {
                 return false;
             }
+            var previousCustomer = candidate;
 
-            var serviceTimeDifference = DistanceCalculator.Calculate(previous, next) -
-                                        DistanceCalculator.Calculate(previous, candidate) -
-                                        DistanceCalculator.Calculate(candidate, next);
             for (var p = _route.Customers.IndexOf(next); p < _route.Customers.Count; p++)
             {
-                var newServiceTime = _route.Customers[p].ServiceStart - serviceTimeDifference;
-                if (newServiceTime < _route.Customers[p].TimeStart || newServiceTime > _route.Customers[p].TimeEnd)
+                var newServiceStartTime = CalculateServiceStart(previousCustomer, previousServiceTime, _route.Customers[p]);
+                if (newServiceStartTime < _route.Customers[p].TimeStart || newServiceStartTime > _route.Customers[p].TimeEnd)
                 {
                     return false;
                 }
+                previousServiceTime = newServiceStartTime;
+                previousCustomer = _route.Customers[p];
             }
             return true;
         }
 
-        private double CalculateServiceStart(Customer previous, Customer candidate)
+        private double CalculateServiceStart(Customer previous, Customer next)
         {
-            return previous.ServiceStart +
+            return Math.Max(next.TimeStart,
+                   previous.ServiceStart +
                    previous.ServiceTime +
-                   DistanceCalculator.Calculate(previous, candidate);
+                   DistanceCalculator.Calculate(previous, next));
+        }
+
+        private double CalculateServiceStart(Customer previous, double previousServiceStart, Customer next)
+        {
+            return Math.Max(next.TimeStart,
+                   previousServiceStart +
+                   previous.ServiceTime +
+                   DistanceCalculator.Calculate(previous, next));
         }
 
         private double InsertionValueOfCustomer(Customer previous, Customer candidate, Customer next)

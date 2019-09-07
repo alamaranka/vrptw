@@ -38,7 +38,8 @@ namespace VRPTW.Heuristics
                 routes.Add(route);
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
-            return new Solution() {
+            return new Solution()
+            {
                 Routes = routes,
                 Cost = CalculateCost(routes)
             };

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VRPTW.Configuration;
-using VRPTW.Data;
 using VRPTW.Helper;
 using VRPTW.Model;
 
@@ -277,7 +276,7 @@ namespace VRPTW.Algorithm
                     {
                         if (currentVertex == 0)
                         {
-                            _vertices[currentVertex].ServiceStart = 
+                            _vertices[currentVertex].ServiceStart =
                                         _serviceStart[vehicle][currentVertex].Get(GRB.DoubleAttr.X);
                             customers.Add(_vertices[currentVertex]);
                         }
@@ -295,7 +294,7 @@ namespace VRPTW.Algorithm
                     var route = new Route()
                     {
                         Customers = customers,
-                        Capacity = customers.Sum(c => c.Demand),
+                        Load = customers.Sum(c => c.Demand),
                         Distance = totalDistanceOfTheRoute
                     };
                     routes.Add(route);

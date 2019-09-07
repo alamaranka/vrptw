@@ -1,5 +1,4 @@
-﻿
-namespace VRPTW.Model
+﻿namespace VRPTW.Model
 {
     public class Customer
     {
@@ -12,9 +11,6 @@ namespace VRPTW.Model
         public int ServiceTime { get; set; }
         public double ServiceStart { get; set; }
         public Route RoutePlanned { get; set; }
-        public Customer Clone()
-        {
-            return this.MemberwiseClone() as Customer;
-        }
+        public Customer Clone() { return this.MemberwiseClone() as Customer; }
     }
 }
