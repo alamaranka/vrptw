@@ -266,33 +266,23 @@ namespace VRPTW.Algorithm
         private Solution GenerateRoutes()
         {
             var routes = new List<Route>();
+            var vehicleCount = 0;
+
             for (int v = 0; v < _numberOfVehicles; v++)
             {
-                var currentVertex = 0;
+                var customers = new List<(int, int, double, double)>();
                 for (int s = 0; s < _numberOfVertices; s++)
                 {
-                    var customers = new List<Customer>();
-                    _vertices[0].ServiceStart = _serviceStart[v][0].Get(GRB.DoubleAttr.X);
-                    customers.Add(_vertices[0]);
                     for (int e = 0; e < _numberOfVertices; e++)
                     {
-                        if (Math.Round(_vehicleTraverse[v][currentVertex][e].Get(GRB.DoubleAttr.X)) == 1.0)
+                        if (Math.Round(_vehicleTraverse[v][s][e].Get(GRB.DoubleAttr.X)) == 1.0)
                         {
-                            _vertices[e].ServiceStart = _serviceStart[v][e].Get(GRB.DoubleAttr.X);
-                            customers.Add(_vertices[e]);
-                            currentVertex = e;
+                            customers.Add((s, e, 
+                                _serviceStart[v][s].Get(GRB.DoubleAttr.X), _serviceStart[v][e].Get(GRB.DoubleAttr.X)));
                         }
                     }
-                    if (customers.Count > 2)
-                    {
-                        routes.Add(new Route()
-                        {
-                            Customers = customers,
-                            Distance = _model.ObjVal,
-                            Capacity = customers.Sum(x => x.Demand)
-                        }) ;
-                    }
                 }
+                if (customers.Count > 1) { vehicleCount++; }
             }
             return new Solution()
             {
