@@ -57,7 +57,7 @@ namespace VRPTW.Algorithm
         private void SetInputData()
         {
             _vertices = _dataset.Vertices;
-            _vertices.Add(_vertices[0]);
+            _vertices.Add(_vertices[0].Clone());
             _vehicles = _dataset.Vehicles;
             _numberOfVertices = _vertices.Count;
             _numberOfCustomers = _vertices.Count - 2;
@@ -266,23 +266,40 @@ namespace VRPTW.Algorithm
         private Solution GenerateRoutes()
         {
             var routes = new List<Route>();
-            var vehicleCount = 0;
-
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int vehicle = 0; vehicle < _numberOfVehicles; vehicle++)
             {
-                var customers = new List<(int, int, double, double)>();
-                for (int s = 0; s < _numberOfVertices; s++)
+                var customers = new List<Customer>();
+                var currentVertex = 0;
+                var totalDistanceOfTheRoute = 0.0;
+                for (int destVertex = 0; destVertex < _numberOfVertices; destVertex++)
                 {
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    if (Math.Round(_vehicleTraverse[vehicle][currentVertex][destVertex].Get(GRB.DoubleAttr.X)) == 1.0)
                     {
-                        if (Math.Round(_vehicleTraverse[v][s][e].Get(GRB.DoubleAttr.X)) == 1.0)
+                        if (currentVertex == 0)
                         {
-                            customers.Add((s, e, 
-                                _serviceStart[v][s].Get(GRB.DoubleAttr.X), _serviceStart[v][e].Get(GRB.DoubleAttr.X)));
+                            _vertices[currentVertex].ServiceStart = 
+                                        _serviceStart[vehicle][currentVertex].Get(GRB.DoubleAttr.X);
+                            customers.Add(_vertices[currentVertex]);
                         }
+                        _vertices[destVertex].ServiceStart =
+                                        _serviceStart[vehicle][destVertex].Get(GRB.DoubleAttr.X);
+                        customers.Add(_vertices[destVertex]);
+                        totalDistanceOfTheRoute += DistanceCalculator
+                                                        .Calculate(_vertices[currentVertex], _vertices[destVertex]);
+                        currentVertex = destVertex;
+                        destVertex = 0;
                     }
                 }
-                if (customers.Count > 1) { vehicleCount++; }
+                if (customers.Count > 2)
+                {
+                    var route = new Route()
+                    {
+                        Customers = customers,
+                        Capacity = customers.Sum(c => c.Demand),
+                        Distance = totalDistanceOfTheRoute
+                    };
+                    routes.Add(route);
+                }
             }
             return new Solution()
             {
