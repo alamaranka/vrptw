@@ -9,9 +9,9 @@ namespace VRPTW.Heuristics
 {
     public class RouteGenerator
     {
-        private Customer _depot;
-        private List<Customer> _candidateCustomers;
-        private double _routeMaxCapacity;
+        private readonly Customer _depot;
+        private readonly List<Customer> _candidateCustomers;
+        private readonly double _routeMaxCapacity;
         public Route _route;
 
         public RouteGenerator(Customer depot, List<Customer> unRoutedCustomers, double routeMaxCapacity)
