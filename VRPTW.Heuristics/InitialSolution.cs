@@ -41,18 +41,8 @@ namespace VRPTW.Heuristics
             return new Solution()
             {
                 Routes = routes,
-                Cost = CalculateCost(routes)
+                Cost = routes.Sum(d => d.Distance)
             };
-        }
-
-        private double CalculateCost(List<Route> routes)
-        {
-            var cost = 0.0;
-            foreach (var route in routes)
-            {
-                cost += route.Distance;
-            }
-            return cost;
         }
     }
 }
