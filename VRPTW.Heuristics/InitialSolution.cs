@@ -34,7 +34,7 @@ namespace VRPTW.Heuristics
             var routes = new List<Route>();
             while (_unRoutedCustomers.Count > 0)
             {
-                var route = new RouteGenerator(_depot, _unRoutedCustomers, _routeMaxCapacity)._route;
+                var route = new RouteGenerator(_depot, _unRoutedCustomers, _routeMaxCapacity).Generate();
                 routes.Add(route);
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }

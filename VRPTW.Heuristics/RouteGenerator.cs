@@ -19,10 +19,9 @@ namespace VRPTW.Heuristics
             _depot = depot;
             _candidateCustomers = unRoutedCustomers;
             _routeMaxCapacity = routeMaxCapacity;
-            Generate();
         }
 
-        public void Generate()
+        public Route Generate()
         {
             InitializeRoute();
 
@@ -59,6 +58,7 @@ namespace VRPTW.Heuristics
                     break; 
                 }
             }
+            return _route;
         }
 
         private void InitializeRoute()
