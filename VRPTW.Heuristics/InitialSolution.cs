@@ -6,7 +6,7 @@ namespace VRPTW.Heuristics
 {
     public class InitialSolution
     {
-        private Dataset _dataset;
+        private readonly Dataset _dataset;
         private Customer _depot;
         private List<Vehicle> _vehicles;
         private List<Customer> _customers;
