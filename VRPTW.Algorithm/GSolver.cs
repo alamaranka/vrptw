@@ -297,6 +297,7 @@ namespace VRPTW.Algorithm
                         Load = customers.Sum(c => c.Demand),
                         Distance = totalDistanceOfTheRoute
                     };
+                    route.Customers.ToList().ForEach(c => c.RoutePlanned = route);
                     routes.Add(route);
                 }
             }

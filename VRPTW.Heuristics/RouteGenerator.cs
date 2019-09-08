@@ -53,7 +53,11 @@ namespace VRPTW.Heuristics
                         anyFeasibleCustomer = true;
                     }
                 }
-                if (!anyFeasibleCustomer) { break; }
+                if (!anyFeasibleCustomer) 
+                {
+                    _route.Customers.ToList().ForEach(c => c.RoutePlanned = _route);
+                    break; 
+                }
             }
         }
 
@@ -80,7 +84,6 @@ namespace VRPTW.Heuristics
                               DistanceCalculator.Calculate(previous, next) +
                               DistanceCalculator.Calculate(previous, candidate) +
                               DistanceCalculator.Calculate(candidate, next);
-            Console.WriteLine("Customer {0} inserted to the route between {1} and {2}", candidate.Name, previous.Name, next.Name);
             _candidateCustomers.Remove(candidate);
         }
 
