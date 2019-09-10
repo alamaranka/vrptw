@@ -29,7 +29,7 @@ namespace VRPTW.Runner
                     break;
             }
 
-            using (StreamWriter file = File.CreateText("C:\\Users\\alamaranka\\Desktop\\Solution.json"))
+            using (StreamWriter file = File.CreateText(""))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, solution);
