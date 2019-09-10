@@ -54,7 +54,6 @@ namespace VRPTW.Heuristics
                 }
                 if (!anyFeasibleCustomer) 
                 {
-                    _route.Customers.ToList().ForEach(c => c.RoutePlanned = _route);
                     break; 
                 }
             }

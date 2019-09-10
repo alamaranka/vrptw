@@ -1,4 +1,7 @@
-﻿using VRPTW.Algorithm;
+﻿using Newtonsoft.Json;
+using System;
+using System.IO;
+using VRPTW.Algorithm;
 using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Heuristics;
@@ -12,7 +15,7 @@ namespace VRPTW.Runner
         {
             var dataSource = Config.GetDataSource();
             var dataset = new DataPreparer(dataSource).GetCustomerAndVehicleData();
-            Solution solution;
+            Solution solution = new Solution();
 
             switch (Config.GetSolverType())
             {
@@ -24,6 +27,12 @@ namespace VRPTW.Runner
                     break;
                 default:
                     break;
+            }
+
+            using (StreamWriter file = File.CreateText("C:\\Users\\alamaranka\\Desktop\\Solution.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, solution);
             }
         }
     }

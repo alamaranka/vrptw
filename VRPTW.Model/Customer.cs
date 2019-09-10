@@ -10,7 +10,6 @@
         public int TimeEnd { get; set; }
         public int ServiceTime { get; set; }
         public double ServiceStart { get; set; }
-        public Route RoutePlanned { get; set; }
         public Customer Clone() { return this.MemberwiseClone() as Customer; }
     }
 }
