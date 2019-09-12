@@ -46,7 +46,8 @@ namespace VRPTW.Heuristics
                     }
                     if (feasibleCustomersToInsert.Count > 0)
                     {
-                        var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers.IndexOf(insertionValueOfFeasibleCustomers.Max());
+                        var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers
+                                                                .IndexOf(insertionValueOfFeasibleCustomers.Max());
                         var bestCustomerToInsert = feasibleCustomersToInsert[indexOfBestFeasibleCustomer];
                         InsertCustomerToTheRoute(previous, bestCustomerToInsert, next);
                         anyFeasibleCustomer = true;
