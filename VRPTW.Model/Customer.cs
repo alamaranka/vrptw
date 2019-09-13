@@ -1,5 +1,8 @@
-﻿namespace VRPTW.Model
+﻿using System;
+
+namespace VRPTW.Model
 {
+    [Serializable]
     public class Customer
     {
         public string Name { get; set; }

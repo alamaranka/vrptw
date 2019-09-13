@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace VRPTW.Model
 {
+    [Serializable]
     public class Route
     {
         public Vehicle Vehicle { get; set; }

@@ -37,7 +37,7 @@ namespace VRPTW.Heuristics
                     var insertionValueOfFeasibleCustomers = new List<double>();
                     foreach (var candidate in _candidateCustomers)
                     {
-                        if (IsFeasibleToInsert(previous, candidate, next))
+                        if (IsFeasibleToInsert(candidate, next))
                         {
                             feasibleCustomersToInsert.Add(candidate);
                             insertionValueOfFeasibleCustomers
@@ -65,7 +65,7 @@ namespace VRPTW.Heuristics
         {
             _route = new Route()
             {
-                Customers = new List<Customer>() { _depot, _depot.Clone() },
+                Customers = new List<Customer>() { _depot, Helpers.Clone(_depot) },
                 Load = 0.0,
                 Distance = 0.0
             };
@@ -81,35 +81,32 @@ namespace VRPTW.Heuristics
             }
             _route.Load += candidate.Demand;
             _route.Distance = _route.Distance -
-                              DistanceCalculator.Calculate(previous, next) +
-                              DistanceCalculator.Calculate(previous, candidate) +
-                              DistanceCalculator.Calculate(candidate, next);
+                              Helpers.CalculateDistance(previous, next) +
+                              Helpers.CalculateDistance(previous, candidate) +
+                              Helpers.CalculateDistance(candidate, next);
             _candidateCustomers.Remove(candidate);
         }
 
-        private bool IsFeasibleToInsert(Customer previous, Customer candidate, Customer next)
+        private bool IsFeasibleToInsert(Customer candidate, Customer next)
         {
             if (_route.Load + candidate.Demand > _routeMaxCapacity)
             {
                 return false;
             }
 
-            var previousServiceTime = CalculateServiceStart(previous, candidate);
-            if (previousServiceTime < candidate.TimeStart || previousServiceTime > candidate.TimeEnd)
-            {
-                return false;
-            }
-            var previousCustomer = candidate;
+            var candidateRoute = Helpers.Clone(_route);
+            candidateRoute.Customers.Insert(_route.Customers.IndexOf(next), candidate);
 
-            for (var p = _route.Customers.IndexOf(next); p < _route.Customers.Count; p++)
+            for (var p = candidateRoute.Customers.IndexOf(candidate); p < candidateRoute.Customers.Count; p++)
             {
-                var newServiceStartTime = CalculateServiceStart(previousCustomer, previousServiceTime, _route.Customers[p]);
-                if (newServiceStartTime < _route.Customers[p].TimeStart || newServiceStartTime > _route.Customers[p].TimeEnd)
+                var newServiceStartTime = CalculateServiceStart(candidateRoute.Customers[p - 1], candidateRoute.Customers[p]);
+                var isBeforeTimeStart = newServiceStartTime < candidateRoute.Customers[p].TimeStart;
+                var isAfterTimeEnd = newServiceStartTime > candidateRoute.Customers[p].TimeEnd;
+                candidateRoute.Customers[p].ServiceStart = newServiceStartTime;
+                if (isBeforeTimeStart || isAfterTimeEnd)
                 {
                     return false;
                 }
-                previousServiceTime = newServiceStartTime;
-                previousCustomer = _route.Customers[p];
             }
             return true;
         }
@@ -119,15 +116,7 @@ namespace VRPTW.Heuristics
             return Math.Max(next.TimeStart,
                    previous.ServiceStart +
                    previous.ServiceTime +
-                   DistanceCalculator.Calculate(previous, next));
-        }
-
-        private double CalculateServiceStart(Customer previous, double previousServiceStart, Customer next)
-        {
-            return Math.Max(next.TimeStart,
-                   previousServiceStart +
-                   previous.ServiceTime +
-                   DistanceCalculator.Calculate(previous, next));
+                   Helpers.CalculateDistance(previous, next));
         }
 
         private double InsertionValueOfCustomer(Customer previous, Customer candidate, Customer next)
@@ -136,20 +125,20 @@ namespace VRPTW.Heuristics
             var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
             var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
             var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
-            var c11 = DistanceCalculator.Calculate(previous, candidate) +
-                      DistanceCalculator.Calculate(candidate, next) -
-                      DistanceCalculator.Calculate(previous, next) * mu;
+            var c11 = Helpers.CalculateDistance(previous, candidate) +
+                      Helpers.CalculateDistance(candidate, next) -
+                      Helpers.CalculateDistance(previous, next) * mu;
             var candidateStartTime = Math.Max(previous.ServiceStart +
                                      previous.ServiceTime +
-                                     DistanceCalculator.Calculate(previous, candidate),
+                                     Helpers.CalculateDistance(previous, candidate),
                                      candidate.TimeStart);
             var c12 = Math.Max(candidateStartTime +
                       candidate.ServiceTime +
-                      DistanceCalculator.Calculate(candidate, next),
+                      Helpers.CalculateDistance(candidate, next),
                       candidate.TimeStart) -
                       next.ServiceStart;
             var c1 = alpha1 * c11 + alpha2 * c12;
-            return lambda * DistanceCalculator.Calculate(_depot, candidate) - c1;
+            return lambda * Helpers.CalculateDistance(_depot, candidate) - c1;
         }
 
         private Customer GetSeedCustomer()
@@ -158,7 +147,7 @@ namespace VRPTW.Heuristics
             var seedCustomer = new Customer();
             foreach (var customer in _candidateCustomers)
             {
-                var distance = DistanceCalculator.Calculate(_depot, customer);
+                var distance = Helpers.CalculateDistance(_depot, customer);
                 if (distance > maxDistance)
                 {
                     maxDistance = distance;

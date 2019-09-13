@@ -112,7 +112,7 @@ namespace VRPTW.Algorithm
                 {
                     for (int e = 0; e < _numberOfVertices; e++)
                     {
-                        var distance = DistanceCalculator.Calculate(_vertices[s], _vertices[e]);
+                        var distance = Helpers.CalculateDistance(_vertices[s], _vertices[e]);
                         _cost.AddTerm(distance, _vehicleTraverse[v][s][e]);
                     }
                 }
@@ -230,7 +230,7 @@ namespace VRPTW.Algorithm
                     for (int e = 0; e < _numberOfVertices; e++)
                     {
                         _model.AddConstr(_serviceStart[v][s]
-                                        + DistanceCalculator.Calculate(_vertices[s], _vertices[e])
+                                        + Helpers.CalculateDistance(_vertices[s], _vertices[e])
                                         + _vertices[s].ServiceTime
                                         - BIGM * (1 - _vehicleTraverse[v][s][e])
                                         - _serviceStart[v][e]
@@ -283,8 +283,7 @@ namespace VRPTW.Algorithm
                         _vertices[destVertex].ServiceStart =
                                         _serviceStart[vehicle][destVertex].Get(GRB.DoubleAttr.X);
                         customers.Add(_vertices[destVertex]);
-                        totalDistanceOfTheRoute += DistanceCalculator
-                                                        .Calculate(_vertices[currentVertex], _vertices[destVertex]);
+                        totalDistanceOfTheRoute += Helpers.CalculateDistance(_vertices[currentVertex], _vertices[destVertex]);
                         currentVertex = destVertex;
                         destVertex = 0;
                     }
