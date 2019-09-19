@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using VRPTW.Algorithm;
+using VRPTW.Algorithm.Benders;
 using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Heuristics;
@@ -21,6 +22,9 @@ namespace VRPTW.Runner
             {
                 case "GSolver":
                     solution = new GSolver(dataset).Run();
+                    break;
+                case "BSolver":
+                    solution = new BSolver(dataset).Run();
                     break;
                 case "Heuristics":
                     solution = new InitialSolution(dataset).Get();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using VRPTW.Helper;
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
@@ -38,11 +39,36 @@ namespace VRPTW.Heuristics
                 routes.Add(route);
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
+            var numberOfRemainingVehicles = _vehicles.Count - routes.Count;
+            for (var i = 0; i < numberOfRemainingVehicles; i++)
+            {
+                var customers = new List<Customer>
+                {
+                    _depot,
+                    Helpers.Clone(_depot)
+                };
+                var route = new Route()
+                {
+                    Customers = customers,
+                    Load = 0.0,
+                    Distance = 0.0
+                };
+                routes.Add(route);
+            }
+            ResetReturningDepotName(routes);
             return new Solution()
             {
                 Routes = routes,
                 Cost = routes.Sum(d => d.Distance)
             };
+        }
+
+        private void ResetReturningDepotName(List<Route> routes)
+        {
+            foreach (var r in routes)
+            {
+                r.Customers.Last().Name = _customers.Count;
+            }
         }
     }
 }

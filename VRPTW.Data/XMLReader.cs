@@ -37,7 +37,7 @@ namespace VRPTW.Data
             {
                 var customer = new Customer
                 {
-                    Name = (string)name[record],
+                    Name = (int)Convert.ToDouble(name[record]),
                     Latitude = (int)Convert.ToDouble(latitude[record]),
                     Longitude = (int)Convert.ToDouble(longitude[record]),
                     Demand = (int)Convert.ToDouble(demand[record]),

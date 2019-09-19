@@ -11,6 +11,7 @@
     <ProjectReference Include="..\VRPTW.Configuration\VRPTW.Configuration.csproj" />
     <ProjectReference Include="..\VRPTW.Data\VRPTW.Data.csproj" />
     <ProjectReference Include="..\VRPTW.Helper\VRPTW.Helper.csproj" />
+    <ProjectReference Include="..\VRPTW.Heuristics\VRPTW.Heuristics.csproj" />
     <ProjectReference Include="..\VRPTW.Model\VRPTW.Model.csproj" />
   </ItemGroup>
 

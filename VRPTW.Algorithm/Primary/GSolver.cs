@@ -8,45 +8,34 @@ using VRPTW.Model;
 
 namespace VRPTW.Algorithm
 {
-    public class GSolver
+    public class GSolver : IAlgorithm
     {
         private GRBEnv _env;
         private GRBModel _model;
         private int _status;
-        private Dataset _dataset;
-        private List<Vehicle> _vehicles;
-        private List<Customer> _vertices;
         private List<List<List<GRBVar>>> _vehicleTraverse;
         private List<List<GRBVar>> _serviceStart;
-
-        private int _numberOfVertices;
-        private int _numberOfCustomers;
-        private int _numberOfVehicles;
-
         private GRBLinExpr _cost;
 
-        private const int BIGM = 1_000;
-        private readonly double _timeLimit;
-        private readonly double _mipGap;
-        private readonly int _threads;
-
-        private Solution _solution = new Solution();
+        private readonly Dataset _dataset;
+        private List<Vehicle> _vehicles;
+        private List<Customer> _vertices;
+        private readonly int BIGM = 1_000;
 
         public GSolver(Dataset dataset)
         {
             _dataset = dataset;
-            _timeLimit = Config.GetSolverParam().TimeLimit;
-            _mipGap = Config.GetSolverParam().MIPGap;
-            _threads = Config.GetSolverParam().Threads;
         }
 
         public Solution Run()
         {
             SetInputData();
-            InitializeEnvAndModel();
+            InitializeEnv();
+            InitializeModel();
             SetSolverParameters();
             InitializeDecisionVariables();
-            CreateDecisionVariables();
+            CreateBinaryDecisionVariables();
+            CreateGeneralDecisionVariables();
             CreateObjective();
             CreateConstraints();
             Solve();
@@ -56,24 +45,25 @@ namespace VRPTW.Algorithm
         private void SetInputData()
         {
             _vertices = _dataset.Vertices;
-            _vertices.Add(_vertices[0].Clone());
+            _vertices.Add(Helpers.Clone(_vertices[0]));
             _vehicles = _dataset.Vehicles;
-            _numberOfVertices = _vertices.Count;
-            _numberOfCustomers = _vertices.Count - 2;
-            _numberOfVehicles = _vehicles.Count;
         }
 
-        private void InitializeEnvAndModel()
+        private void InitializeEnv()
         {
             _env = new GRBEnv("VRPTW");
+        }
+
+        private void InitializeModel()
+        {
             _model = new GRBModel(_env);
         }
 
         private void SetSolverParameters()
         {
-            _model.Parameters.TimeLimit = _timeLimit;
-            _model.Parameters.MIPGap = _mipGap;
-            _model.Parameters.Threads = _threads;
+            _model.Parameters.TimeLimit = Config.GetSolverParam().TimeLimit;
+            _model.Parameters.MIPGap = Config.GetSolverParam().MIPGap;
+            _model.Parameters.Threads = Config.GetSolverParam().Threads;
         }
 
         private void InitializeDecisionVariables()
@@ -82,23 +72,33 @@ namespace VRPTW.Algorithm
             _serviceStart = new List<List<GRBVar>>();
         }
 
-        private void CreateDecisionVariables()
+        private void CreateBinaryDecisionVariables()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
                 List<List<GRBVar>> vehicleTraverseV = new List<List<GRBVar>>();
-                List<GRBVar> serviceStartV = new List<GRBVar>();
-                for (int s = 0; s < _numberOfVertices; s++)
+                for (int s = 0; s < _vertices.Count; s++)
                 {
                     List<GRBVar> vehicleTraverseC = new List<GRBVar>();
-                    serviceStartV.Add(_model.AddVar(0, BIGM, 0, GRB.CONTINUOUS, ""));
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    for (int e = 0; e < _vertices.Count; e++)
                     {
                         vehicleTraverseC.Add(_model.AddVar(0, 1, 0, GRB.BINARY, ""));
                     }
                     vehicleTraverseV.Add(vehicleTraverseC);
                 }
                 _vehicleTraverse.Add(vehicleTraverseV);
+            }
+        }
+
+        private void CreateGeneralDecisionVariables()
+        {
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                List<GRBVar> serviceStartV = new List<GRBVar>();
+                for (int s = 0; s < _vertices.Count; s++)
+                {
+                    serviceStartV.Add(_model.AddVar(0, BIGM, 0, GRB.CONTINUOUS, ""));
+                }
                 _serviceStart.Add(serviceStartV);
             }
         }
@@ -106,11 +106,11 @@ namespace VRPTW.Algorithm
         private void CreateObjective()
         {
             _cost = new GRBLinExpr();
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
-                for (int s = 0; s < _numberOfVertices; s++)
+                for (int s = 0; s < _vertices.Count; s++)
                 {
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    for (int e = 0; e < _vertices.Count; e++)
                     {
                         var distance = Helpers.CalculateDistance(_vertices[s], _vertices[e]);
                         _cost.AddTerm(distance, _vehicleTraverse[v][s][e]);
@@ -134,25 +134,25 @@ namespace VRPTW.Algorithm
 
         private void UnAllowedTraverses()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
-                for (int s = 0; s < _numberOfVertices; s++)
+                for (int s = 0; s < _vertices.Count; s++)
                 {
                     _model.AddConstr(_vehicleTraverse[v][s][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_S");
                     _model.AddConstr(_vehicleTraverse[v][s][0], GRB.EQUAL, 0.0, "_UnAllowedTraverses_0");
-                    _model.AddConstr(_vehicleTraverse[v][_numberOfVertices - 1][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_N+1");
+                    _model.AddConstr(_vehicleTraverse[v][_vertices.Count - 1][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_N+1");
                 }
             }
         }
 
         private void EachCustomerMustBeVisitedOnce()
         {
-            for (int s = 1; s <= _numberOfCustomers; s++)
+            for (int s = 1; s <= _vertices.Count - 2; s++)
             {
                 var customerVisit = new GRBLinExpr();
-                for (int v = 0; v < _numberOfVehicles; v++)
+                for (int v = 0; v < _vehicles.Count; v++)
                 {
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    for (int e = 0; e < _vertices.Count; e++)
                     {
                         customerVisit.AddTerm(1.0, _vehicleTraverse[v][s][e]);
                     }
@@ -163,10 +163,10 @@ namespace VRPTW.Algorithm
 
         private void AllVehiclesMustStartFromTheDepot()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
                 var vehicleStart = new GRBLinExpr();
-                for (int e = 0; e < _numberOfVertices; e++)
+                for (int e = 0; e < _vertices.Count; e++)
                 {
                     vehicleStart.AddTerm(1.0, _vehicleTraverse[v][0][e]);
                 }
@@ -176,12 +176,12 @@ namespace VRPTW.Algorithm
 
         private void AllVehiclesMustEndAtTheDepot()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
                 var vehicleStart = new GRBLinExpr();
-                for (int s = 0; s < _numberOfVertices; s++)
+                for (int s = 0; s < _vertices.Count; s++)
                 {
-                    vehicleStart.AddTerm(1.0, _vehicleTraverse[v][s][_numberOfVertices - 1]);
+                    vehicleStart.AddTerm(1.0, _vehicleTraverse[v][s][_vertices.Count - 1]);
                 }
                 _model.AddConstr(vehicleStart, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
             }
@@ -189,13 +189,13 @@ namespace VRPTW.Algorithm
 
         private void VehiclesMustLeaveTheArrivingCustomer()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
-                for (int s = 1; s <= _numberOfCustomers; s++)
+                for (int s = 1; s <= _vertices.Count - 2; s++)
                 {
                     var arrival = new GRBLinExpr();
                     var leave = new GRBLinExpr();
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    for (int e = 0; e < _vertices.Count; e++)
                     {
                         arrival.AddTerm(1.0, _vehicleTraverse[v][e][s]);
                         leave.AddTerm(1.0, _vehicleTraverse[v][s][e]);
@@ -207,12 +207,12 @@ namespace VRPTW.Algorithm
 
         private void VehiclesLoadUpCapacity()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
                 var vehicleCapacity = new GRBLinExpr();
-                for (int s = 1; s <= _numberOfCustomers; s++)
+                for (int s = 1; s <= _vertices.Count - 2; s++)
                 {
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    for (int e = 0; e < _vertices.Count; e++)
                     {
                         vehicleCapacity.AddTerm(_vertices[s].Demand, _vehicleTraverse[v][s][e]);
                     }
@@ -223,11 +223,11 @@ namespace VRPTW.Algorithm
 
         private void DepartureFromACustomerAndItsImmediateSuccessor()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
-                for (int s = 0; s < _numberOfVertices; s++)
+                for (int s = 0; s < _vertices.Count; s++)
                 {
-                    for (int e = 0; e < _numberOfVertices; e++)
+                    for (int e = 0; e < _vertices.Count; e++)
                     {
                         _model.AddConstr(_serviceStart[v][s]
                                         + Helpers.CalculateDistance(_vertices[s], _vertices[e])
@@ -244,9 +244,9 @@ namespace VRPTW.Algorithm
 
         private void TimeWindowsMustBeSatisfied()
         {
-            for (int v = 0; v < _numberOfVehicles; v++)
+            for (int v = 0; v < _vehicles.Count; v++)
             {
-                for (int s = 0; s < _numberOfVertices; s++)
+                for (int s = 0; s < _vertices.Count; s++)
                 {
                     _model.AddConstr(_serviceStart[v][s], GRB.LESS_EQUAL
                                     , _vertices[s].TimeEnd, "_TimeWindowsMustBeSatisfied_Upper");
@@ -265,12 +265,12 @@ namespace VRPTW.Algorithm
         private Solution GenerateRoutes()
         {
             var routes = new List<Route>();
-            for (int vehicle = 0; vehicle < _numberOfVehicles; vehicle++)
+            for (int vehicle = 0; vehicle < _vehicles.Count; vehicle++)
             {
                 var customers = new List<Customer>();
                 var currentVertex = 0;
                 var totalDistanceOfTheRoute = 0.0;
-                for (int destVertex = 0; destVertex < _numberOfVertices; destVertex++)
+                for (int destVertex = 0; destVertex < _vertices.Count; destVertex++)
                 {
                     if (Math.Round(_vehicleTraverse[vehicle][currentVertex][destVertex].Get(GRB.DoubleAttr.X)) == 1.0)
                     {
