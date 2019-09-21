@@ -79,8 +79,7 @@ namespace VRPTW.Algorithm.Benders
             var duals = new double[constrs.Length];
             for (var c = 0; c < constrs.Length; c++)
             {
-                if (constrs[c].Pi != 0)
-                    duals[c] = constrs[c].Pi;
+                duals[c] = constrs[c].Pi;
             }
             return duals;
         }
