@@ -29,8 +29,8 @@ namespace VRPTW.Algorithm.Benders
 
         public Solution Run()
         {
-            SetInputData();
             GenerateInitialIntegerSolution();
+            SetInputData();
             InitializeEnv();
             GenerateMasterProblem();
             GenerateSubProblem();
@@ -39,8 +39,7 @@ namespace VRPTW.Algorithm.Benders
             {
                 //do stuff
                 _subProblem.Optimize();
-                var constraints = _subProblem.GetConstrs();
-                var duals = constraints[0].Pi;
+                var duals = GetDuals(_subProblem.GetConstrs());
             }
 
             return new Solution();
@@ -48,9 +47,9 @@ namespace VRPTW.Algorithm.Benders
 
         private void GenerateInitialIntegerSolution()
         {
-            var initialSolution = new InitialSolution(Helpers.Clone(_dataset)).Get();
+            var initialSolution = new InitialSolution(_dataset).Get();
             _binarySolution = Helpers.ExtractVehicleTraverseFromSolution
-                                        (initialSolution, _dataset.Vehicles, _dataset.Vertices);
+                                     (initialSolution, _dataset.Vehicles.Count, _dataset.Vertices.Count);
         }
 
         private void SetInputData()
@@ -75,24 +74,14 @@ namespace VRPTW.Algorithm.Benders
             _subProblem = new SubProblem(_env, _vehicles, _vertices, _binarySolution).GetModel();
         }
 
-        private List<List<List<double>>> InitializeBinarySolution()
+        private double[] GetDuals(GRBConstr[] constrs)
         {
-            var binarySolution = new List<List<List<double>>>();
-            for (int v = 0; v < _dataset.Vehicles.Count; v++)
+            var duals = new double[constrs.Length];
+            for (var c = 0; c < constrs.Length; c++)
             {
-                var binarySolutionV = new List<List<double>>();
-                for (int s = 0; s < _dataset.Vertices.Count + 1; s++)
-                {
-                    var binarySolutionC = new List<double>();
-                    for (int e = 0; e < _dataset.Vertices.Count + 1; e++)
-                    {
-                        binarySolutionC.Add(0.0);
-                    }
-                    binarySolutionV.Add(binarySolutionC);
-                }
-                binarySolution.Add(binarySolutionV);
+                duals[c] = constrs[c].Pi;
             }
-            return binarySolution;
+            return duals;
         }
     }
 }
