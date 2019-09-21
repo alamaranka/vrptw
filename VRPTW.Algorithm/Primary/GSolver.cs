@@ -20,6 +20,7 @@ namespace VRPTW.Algorithm
         private readonly Dataset _dataset;
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
+        private readonly int BIGM = 1_000;
 
         public GSolver(Dataset dataset)
         {
@@ -96,7 +97,7 @@ namespace VRPTW.Algorithm
                 List<GRBVar> serviceStartV = new List<GRBVar>();
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    serviceStartV.Add(_model.AddVar(0, BigM(), 0, GRB.CONTINUOUS, ""));
+                    serviceStartV.Add(_model.AddVar(0, BIGM, 0, GRB.CONTINUOUS, ""));
                 }
                 _serviceStart.Add(serviceStartV);
             }
@@ -231,7 +232,7 @@ namespace VRPTW.Algorithm
                         _model.AddConstr(_serviceStart[v][s]
                                         + Helpers.CalculateDistance(_vertices[s], _vertices[e])
                                         + _vertices[s].ServiceTime
-                                        - BigM() * (1 - _vehicleTraverse[v][s][e])
+                                        - BIGM * (1 - _vehicleTraverse[v][s][e])
                                         - _serviceStart[v][e]
                                         , GRB.LESS_EQUAL
                                         , 0.0
@@ -247,17 +248,12 @@ namespace VRPTW.Algorithm
             {
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    _model.AddConstr(_serviceStart[v][s], GRB.LESS_EQUAL,
-                                     _vertices[s].TimeEnd, "_TimeWindowsMustBeSatisfied_Upper");
-                    _model.AddConstr(_serviceStart[v][s], GRB.GREATER_EQUAL,
-                                     _vertices[s].TimeStart, "_TimeWindowsMustBeSatisfied_Lower");
+                    _model.AddConstr(_serviceStart[v][s], GRB.LESS_EQUAL
+                                    , _vertices[s].TimeEnd, "_TimeWindowsMustBeSatisfied_Upper");
+                    _model.AddConstr(_serviceStart[v][s], GRB.GREATER_EQUAL
+                                    , _vertices[s].TimeStart, "_TimeWindowsMustBeSatisfied_Lower");
                 }
             }
-        }
-
-        private double BigM()
-        {
-            return _vertices[0].TimeEnd - _vertices[0].TimeStart;
         }
 
         private void Solve()
@@ -292,13 +288,16 @@ namespace VRPTW.Algorithm
                         destVertex = 0;
                     }
                 }
-                var route = new Route()
+                if (customers.Count > 2)
                 {
-                    Customers = customers,
-                    Load = customers.Sum(c => c.Demand),
-                    Distance = totalDistanceOfTheRoute
-                };
-                routes.Add(route);
+                    var route = new Route()
+                    {
+                        Customers = customers,
+                        Load = customers.Sum(c => c.Demand),
+                        Distance = totalDistanceOfTheRoute
+                    };
+                    routes.Add(route);
+                }
             }
             return new Solution()
             {

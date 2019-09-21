@@ -38,9 +38,10 @@ namespace VRPTW.Helper
             }
         }
 
-        public static double[,,] ExtractVehicleTraverseFromSolution(Solution solution, int vehicleCount, int verticesCount)
+        public static double[,,] ExtractVehicleTraverseFromSolution(Solution solution, 
+                                                                    List<Vehicle> vehicles, List<Customer> vertices)
         {
-            var vehicleTraverse = new double[vehicleCount, verticesCount + 1, verticesCount + 1];
+            var vehicleTraverse = new double[vehicles.Count, vertices.Count, vertices.Count];
 
             for (int r = 0; r < solution.Routes.Count; r++)
             {

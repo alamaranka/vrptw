@@ -9,6 +9,8 @@ namespace VRPTW.Heuristics
     {
         private readonly Dataset _dataset;
         private Customer _depot;
+        private List<Vehicle> _vehicles;
+        private List<Customer> _customers;
         private List<Customer> _unRoutedCustomers;
         private double _routeMaxCapacity;
 
@@ -19,9 +21,12 @@ namespace VRPTW.Heuristics
 
         private void SetInputData()
         {
-            _depot = _dataset.Vertices[0];
-            _unRoutedCustomers = _dataset.Vertices.GetRange(1, _dataset.Vertices.Count - 1);
-            _routeMaxCapacity = _dataset.Vehicles[0].Capacity;
+            _customers = _dataset.Vertices;
+            _vehicles = _dataset.Vehicles;
+            _depot = _customers[0];
+            _customers.RemoveAt(0);
+            _unRoutedCustomers = _customers.ToList();
+            _routeMaxCapacity = _vehicles[0].Capacity;
         }
 
         public Solution Get()
@@ -34,7 +39,7 @@ namespace VRPTW.Heuristics
                 routes.Add(route);
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
-            var numberOfRemainingVehicles = _dataset.Vehicles.Count - routes.Count;
+            var numberOfRemainingVehicles = _vehicles.Count - routes.Count;
             for (var i = 0; i < numberOfRemainingVehicles; i++)
             {
                 var customers = new List<Customer>
@@ -62,7 +67,7 @@ namespace VRPTW.Heuristics
         {
             foreach (var r in routes)
             {
-                r.Customers.Last().Name = _dataset.Vertices.Count;
+                r.Customers.Last().Name = _customers.Count;
             }
         }
     }

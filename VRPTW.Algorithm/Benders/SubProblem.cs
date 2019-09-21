@@ -18,6 +18,7 @@ namespace VRPTW.Algorithm.Benders
         
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
+        private readonly int BIGM = 1_000;
         private readonly double[,,] _binarySolution;
         
         public SubProblem(GRBEnv env, List<Vehicle> vehicles, List<Customer> vertices, double[,,] binarySolution)
@@ -74,7 +75,7 @@ namespace VRPTW.Algorithm.Benders
                 List<GRBVar> serviceStartV = new List<GRBVar>();
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    serviceStartV.Add(_model.AddVar(0, BigM(), 0, GRB.CONTINUOUS, ""));
+                    serviceStartV.Add(_model.AddVar(0, BIGM, 0, GRB.CONTINUOUS, ""));
                 }
                 _serviceStart.Add(serviceStartV);
             }
@@ -100,13 +101,13 @@ namespace VRPTW.Algorithm.Benders
         private void CreateConstraints()
         {
             UnAllowedTraverses();
-            EachCustomerMustBeVisitedOnce();
-            AllVehiclesMustStartFromTheDepot();
-            AllVehiclesMustEndAtTheDepot();
-            VehiclesMustLeaveTheArrivingCustomer();
-            VehiclesLoadUpCapacity();
-            DepartureFromACustomerAndItsImmediateSuccessor();
-            TimeWindowsMustBeSatisfied();
+            //EachCustomerMustBeVisitedOnce();
+            //AllVehiclesMustStartFromTheDepot();
+            //AllVehiclesMustEndAtTheDepot();
+            //VehiclesMustLeaveTheArrivingCustomer();
+            //VehiclesLoadUpCapacity();
+            //DepartureFromACustomerAndItsImmediateSuccessor();
+            //TimeWindowsMustBeSatisfied();
         }
 
         private void UnAllowedTraverses()
@@ -209,7 +210,7 @@ namespace VRPTW.Algorithm.Benders
                         _model.AddConstr(_serviceStart[v][s]
                                         + Helpers.CalculateDistance(_vertices[s], _vertices[e])
                                         + _vertices[s].ServiceTime
-                                        - BigM() * (1 - _binarySolution[v,s,e])
+                                        - BIGM * (1 - _binarySolution[v,s,e])
                                         - _serviceStart[v][e]
                                         , GRB.LESS_EQUAL
                                         , 0.0
@@ -225,17 +226,12 @@ namespace VRPTW.Algorithm.Benders
             {
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    _model.AddConstr(_serviceStart[v][s], GRB.LESS_EQUAL,
-                                     _vertices[s].TimeEnd, "_TimeWindowsMustBeSatisfied_Upper");
-                    _model.AddConstr(_serviceStart[v][s], GRB.GREATER_EQUAL,
-                                     _vertices[s].TimeStart, "_TimeWindowsMustBeSatisfied_Lower");
+                    _model.AddConstr(_serviceStart[v][s], GRB.LESS_EQUAL
+                                    , _vertices[s].TimeEnd, "_TimeWindowsMustBeSatisfied_Upper");
+                    _model.AddConstr(_serviceStart[v][s], GRB.GREATER_EQUAL
+                                    , _vertices[s].TimeStart, "_TimeWindowsMustBeSatisfied_Lower");
                 }
             }
-        }
-
-        private double BigM()
-        {
-            return _vertices[0].TimeEnd - _vertices[0].TimeStart;
         }
     }
 }
