@@ -39,7 +39,7 @@ namespace VRPTW.Algorithm.Benders
             {
                 //do stuff
                 _subProblem.Optimize();
-                var duals = GetDuals(_subProblem.GetConstrs());
+                var duals = GetNonzeroDuals(_subProblem.GetConstrs());
             }
 
             return new Solution();
@@ -74,12 +74,24 @@ namespace VRPTW.Algorithm.Benders
             _subProblem = new SubProblem(_env, _vehicles, _vertices, _binarySolution).GetModel();
         }
 
-        private double[] GetDuals(GRBConstr[] constrs)
+        private double[] GetAllDuals(GRBConstr[] constrs)
         {
             var duals = new double[constrs.Length];
             for (var c = 0; c < constrs.Length; c++)
             {
-                duals[c] = constrs[c].Pi;
+                if (constrs[c].Pi != 0)
+                    duals[c] = constrs[c].Pi;
+            }
+            return duals;
+        }
+
+        private List<double> GetNonzeroDuals(GRBConstr[] constrs)
+        {
+            var duals = new List<double>();
+            for (var c = 0; c < constrs.Length; c++)
+            {
+                if (constrs[c].Pi != 0.0)
+                    duals.Add(constrs[c].Pi);
             }
             return duals;
         }
