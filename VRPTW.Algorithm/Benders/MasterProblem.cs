@@ -1,21 +1,15 @@
 ﻿using Gurobi;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using VRPTW.Configuration;
-using VRPTW.Helper;
 using VRPTW.Model;
 
 namespace VRPTW.Algorithm.Benders
 {
     class MasterProblem
     {
-        private GRBEnv _env;
         private GRBModel _model;
-        private int _status;
         private List<List<List<GRBVar>>> _vehicleTraverse;
         private GRBVar _z;       
-
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
         
@@ -24,7 +18,6 @@ namespace VRPTW.Algorithm.Benders
             _vehicles = vehicles;
             _vertices = vertices;
             _model = new GRBModel(env);
-            _env = env;
             Generate();
         }
 
@@ -35,17 +28,11 @@ namespace VRPTW.Algorithm.Benders
 
         public void Generate()
         {
-            InitializeModel();
             SetSolverParameters();
             InitializeDecisionVariables();
             CreateBinaryDecisionVariables();
             CreateGeneralDecisionVariables();
             CreateObjective();
-        }
-
-        private void InitializeModel()
-        {
-            _model = new GRBModel(_env);
         }
 
         private void SetSolverParameters()
@@ -71,7 +58,7 @@ namespace VRPTW.Algorithm.Benders
                     List<GRBVar> vehicleTraverseC = new List<GRBVar>();
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        vehicleTraverseC.Add(_model.AddVar(0, 1, 0, GRB.BINARY, ""));
+                        vehicleTraverseC.Add(_model.AddVar(0, 1, 0, GRB.BINARY, "vehicle_traverse_" + v + s + e));
                     }
                     vehicleTraverseV.Add(vehicleTraverseC);
                 }

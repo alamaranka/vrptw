@@ -1,7 +1,5 @@
 ﻿using Gurobi;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Model;
@@ -10,12 +8,9 @@ namespace VRPTW.Algorithm.Benders
 {
     class SubProblem
     {
-        private GRBEnv _env;
         private GRBModel _model;
-        private int _status;
         private List<List<GRBVar>> _serviceStart;
-        private GRBLinExpr _cost;
-        
+        private GRBLinExpr _cost;  
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
         private readonly double[,,] _binarySolution;
@@ -25,7 +20,6 @@ namespace VRPTW.Algorithm.Benders
             _vehicles = vehicles;
             _vertices = vertices;
             _model = new GRBModel(env);
-            _env = env;
             _binarySolution = binarySolution;
             Generate();
         }
@@ -35,24 +29,13 @@ namespace VRPTW.Algorithm.Benders
             return _model;
         }
 
-        public void DisposeModel()
-        {
-            _model.Dispose();
-        }
-
         private void Generate()
         {
-            InitializeModel();
             SetSolverParameters();
             InitializeDecisionVariables();
             CreateGeneralDecisionVariables();
             CreateObjective();
             CreateConstraints();
-        }
-
-        private void InitializeModel()
-        {
-            _model = new GRBModel(_env);
         }
 
         private void SetSolverParameters()
@@ -74,7 +57,7 @@ namespace VRPTW.Algorithm.Benders
                 List<GRBVar> serviceStartV = new List<GRBVar>();
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    serviceStartV.Add(_model.AddVar(0, BigM(), 0, GRB.CONTINUOUS, ""));
+                    serviceStartV.Add(_model.AddVar(0, BigM(), 0, GRB.CONTINUOUS, "service_start" + v + s));
                 }
                 _serviceStart.Add(serviceStartV);
             }
@@ -155,12 +138,12 @@ namespace VRPTW.Algorithm.Benders
         {
             for (int v = 0; v < _vehicles.Count; v++)
             {
-                var vehicleStart = 0.0;
+                var vehicleEnd = 0.0;
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    vehicleStart += _binarySolution[v,s,_vertices.Count - 1];
+                    vehicleEnd += _binarySolution[v,s,_vertices.Count - 1];
                 }
-                _model.AddConstr(vehicleStart, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
+                _model.AddConstr(vehicleEnd, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
             }
         }
 

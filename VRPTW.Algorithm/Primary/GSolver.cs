@@ -16,7 +16,6 @@ namespace VRPTW.Algorithm
         private List<List<List<GRBVar>>> _vehicleTraverse;
         private List<List<GRBVar>> _serviceStart;
         private GRBLinExpr _cost;
-
         private readonly Dataset _dataset;
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
@@ -81,7 +80,7 @@ namespace VRPTW.Algorithm
                     List<GRBVar> vehicleTraverseC = new List<GRBVar>();
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        vehicleTraverseC.Add(_model.AddVar(0, 1, 0, GRB.BINARY, ""));
+                        vehicleTraverseC.Add(_model.AddVar(0, 1, 0, GRB.BINARY, "vehicle_traverse_" + v + s + e));
                     }
                     vehicleTraverseV.Add(vehicleTraverseC);
                 }
@@ -96,7 +95,7 @@ namespace VRPTW.Algorithm
                 List<GRBVar> serviceStartV = new List<GRBVar>();
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    serviceStartV.Add(_model.AddVar(0, BigM(), 0, GRB.CONTINUOUS, ""));
+                    serviceStartV.Add(_model.AddVar(0, BigM(), 0, GRB.CONTINUOUS, "service_start_" + v + s));
                 }
                 _serviceStart.Add(serviceStartV);
             }
@@ -177,12 +176,12 @@ namespace VRPTW.Algorithm
         {
             for (int v = 0; v < _vehicles.Count; v++)
             {
-                var vehicleStart = new GRBLinExpr();
+                var vehicleEnd = new GRBLinExpr();
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    vehicleStart.AddTerm(1.0, _vehicleTraverse[v][s][_vertices.Count - 1]);
+                    vehicleEnd.AddTerm(1.0, _vehicleTraverse[v][s][_vertices.Count - 1]);
                 }
-                _model.AddConstr(vehicleStart, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
+                _model.AddConstr(vehicleEnd, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
             }
         }
 

@@ -1,8 +1,5 @@
 ﻿using Gurobi;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Heuristics;
 using VRPTW.Model;
