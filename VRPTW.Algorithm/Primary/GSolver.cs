@@ -193,14 +193,12 @@ namespace VRPTW.Algorithm
             {
                 for (int s = 1; s <= _vertices.Count - 2; s++)
                 {
-                    var arrival = new GRBLinExpr();
-                    var leave = new GRBLinExpr();
+                    var flow = new GRBLinExpr();
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        arrival.AddTerm(1.0, _vehicleTraverse[v][e][s]);
-                        leave.AddTerm(1.0, _vehicleTraverse[v][s][e]);
+                        flow.AddTerm(1.0, _vehicleTraverse[v][e][s] - _vehicleTraverse[v][s][e]);
                     }
-                    _model.AddConstr(arrival - leave, GRB.EQUAL, 0.0, "_VehiclesMustLeaveTheArrivingCustomer");
+                    _model.AddConstr(flow, GRB.EQUAL, 0.0, "_VehiclesMustLeaveTheArrivingCustomer");
                 }
             }
         }
