@@ -196,7 +196,7 @@ namespace VRPTW.Algorithm
                     var flow = new GRBLinExpr();
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        flow.AddTerm(1.0, _vehicleTraverse[v][e][s] - _vehicleTraverse[v][s][e]);
+                        flow.Add(_vehicleTraverse[v][e][s] - _vehicleTraverse[v][s][e]);
                     }
                     _model.AddConstr(flow, GRB.EQUAL, 0.0, "_VehiclesMustLeaveTheArrivingCustomer");
                 }
