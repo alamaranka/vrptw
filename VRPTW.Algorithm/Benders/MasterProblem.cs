@@ -7,7 +7,7 @@ namespace VRPTW.Algorithm.Benders
 {
     class MasterProblem
     {
-        private GRBModel _model;
+        public GRBModel _model { get; }
         private List<List<List<GRBVar>>> _vehicleTraverse;
         private GRBVar _z;       
         private List<Vehicle> _vehicles;
@@ -21,12 +21,55 @@ namespace VRPTW.Algorithm.Benders
             Generate();
         }
 
-        public GRBModel GetModel()
+        public void AddFeasibilityCut(double[] duals, double[] rhs)
         {
-            return _model;
+            var expr = new GRBLinExpr();
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                for (int s = 0; s < _vertices.Count; s++)
+                {
+                    for (int e = 0; e < _vertices.Count; e++)
+                    {
+                        expr.AddTerm(1.0, _vehicleTraverse[v][s][e]);
+                    }
+                }
+            }
+            _model.AddConstr(_z, GRB.GREATER_EQUAL, expr, "");
         }
 
-        public void Generate()
+        public void AddOptimalityCut(double[] duals, double[] rhs)
+        {
+            var expr = new GRBLinExpr();
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                for (int s = 0; s < _vertices.Count; s++)
+                {
+                    for (int e = 0; e < _vertices.Count; e++)
+                    {
+                        expr.AddTerm(1.0, _vehicleTraverse[v][s][e]);
+                    }
+                }
+            }
+            _model.AddConstr(_z, GRB.GREATER_EQUAL, expr, "");
+        }
+
+        public double[,,] GetSolution()
+        {
+            var solution = new double[_vehicles.Count, _vertices.Count, _vertices.Count];
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                for (int s = 0; s < _vertices.Count; s++)
+                {
+                    for (int e = 0; e < _vertices.Count; e++)
+                    {
+                        solution[v, s, e] = _vehicleTraverse[v][s][e].Get(GRB.DoubleAttr.X);
+                    }
+                }
+            }
+            return solution;
+        }
+
+        private void Generate()
         {
             SetSolverParameters();
             InitializeDecisionVariables();
@@ -76,6 +119,6 @@ namespace VRPTW.Algorithm.Benders
             var cost = new GRBLinExpr();
             cost.AddTerm(1.0, _z);
             _model.SetObjective(cost, GRB.MINIMIZE);
-        }
+        } 
     }
 }

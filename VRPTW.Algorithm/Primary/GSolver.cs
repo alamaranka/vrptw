@@ -132,15 +132,17 @@ namespace VRPTW.Algorithm
 
         private void UnAllowedTraverses()
         {
+            var unAllowedTraverses = new GRBLinExpr();
             for (int v = 0; v < _vehicles.Count; v++)
             {
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    _model.AddConstr(_vehicleTraverse[v][s][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_S");
-                    _model.AddConstr(_vehicleTraverse[v][s][0], GRB.EQUAL, 0.0, "_UnAllowedTraverses_0");
-                    _model.AddConstr(_vehicleTraverse[v][_vertices.Count - 1][s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_N+1");
+                    unAllowedTraverses += _vehicleTraverse[v][s][s] +
+                                          _vehicleTraverse[v][s][0] +
+                                          _vehicleTraverse[v][_vertices.Count - 1][s];
                 }
             }
+            _model.AddConstr(unAllowedTraverses, GRB.EQUAL, 0.0, "_UnAllowedTraverses");
         }
 
         private void EachCustomerMustBeVisitedOnce()

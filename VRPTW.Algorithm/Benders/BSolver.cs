@@ -12,12 +12,9 @@ namespace VRPTW.Algorithm.Benders
         private double LB = double.MinValue;
         private readonly double _epsilon = 0.01;
         private GRBEnv _env;
-        private GRBModel _masterProblem;
-        private GRBModel _subProblem;
         private readonly Dataset _dataset;
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
-        private double[,,] _binarySolution;
 
         public BSolver(Dataset dataset)
         {
@@ -26,26 +23,38 @@ namespace VRPTW.Algorithm.Benders
 
         public Solution Run()
         {
-            GenerateInitialIntegerSolution();
+            var integerSolution = GenerateInitialIntegerSolution();
             SetInputData();
             InitializeEnv();
-            GenerateMasterProblem();
-            GenerateSubProblem();
+            var masterProblem = GenerateMasterProblem();
 
             while (UB - LB > _epsilon)
             {
-                //do stuff
-                _subProblem.Optimize();
-                var duals = GetNonzeroDuals(_subProblem.GetConstrs());
+                var subProblem = GenerateSubProblem(integerSolution);
+                subProblem._model.Optimize();
+                var status = subProblem._model.Status;
+                var duals = GetDuals(subProblem._model.GetConstrs());
+                var rhs = GetRhs(subProblem._model.GetConstrs());
+                if (status == GRB.Status.INFEASIBLE)
+                {
+                    masterProblem.AddFeasibilityCut(duals, rhs);
+                } 
+                else if (status == GRB.Status.OPTIMAL)
+                {
+                    masterProblem.AddOptimalityCut(duals, rhs);
+                }
+                masterProblem._model.Optimize();
+                integerSolution = masterProblem.GetSolution();
+                LB = masterProblem._model.Get(GRB.DoubleAttr.ObjVal);
             }
 
             return new Solution();
         }
 
-        private void GenerateInitialIntegerSolution()
+        private double[,,] GenerateInitialIntegerSolution()
         {
             var initialSolution = new InitialSolution(_dataset).Get();
-            _binarySolution = Helpers.ExtractVehicleTraverseFromSolution
+            return Helpers.ExtractVehicleTraverseFromSolution
                                      (initialSolution, _dataset.Vehicles.Count, _dataset.Vertices.Count);
         }
 
@@ -61,17 +70,17 @@ namespace VRPTW.Algorithm.Benders
             _env = new GRBEnv("VRPTW");
         }
 
-        private void GenerateMasterProblem()
+        private MasterProblem GenerateMasterProblem()
         {
-            _masterProblem = new MasterProblem(_env, _vehicles, _vertices).GetModel();
+            return new MasterProblem(_env, _vehicles, _vertices);
         }
 
-        private void GenerateSubProblem()
+        private SubProblem GenerateSubProblem(double[,,] integerSolution)
         {
-            _subProblem = new SubProblem(_env, _vehicles, _vertices, _binarySolution).GetModel();
+            return new SubProblem(_env, _vehicles, _vertices, integerSolution);
         }
 
-        private double[] GetAllDuals(GRBConstr[] constrs)
+        private double[] GetDuals(GRBConstr[] constrs)
         {
             var duals = new double[constrs.Length];
             for (var c = 0; c < constrs.Length; c++)
@@ -81,15 +90,14 @@ namespace VRPTW.Algorithm.Benders
             return duals;
         }
 
-        private List<double> GetNonzeroDuals(GRBConstr[] constrs)
+        private double[] GetRhs(GRBConstr[] constrs)
         {
-            var duals = new List<double>();
+            var rhs = new double[constrs.Length];
             for (var c = 0; c < constrs.Length; c++)
             {
-                if (constrs[c].Pi != 0.0)
-                    duals.Add(constrs[c].Pi);
+                rhs[c] = constrs[c].RHS;
             }
-            return duals;
+            return rhs;
         }
     }
 }

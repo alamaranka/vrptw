@@ -1,5 +1,6 @@
 ﻿using Gurobi;
 using System.Collections.Generic;
+using System.Linq;
 using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Model;
@@ -8,25 +9,24 @@ namespace VRPTW.Algorithm.Benders
 {
     class SubProblem
     {
-        private GRBModel _model;
         private List<List<GRBVar>> _serviceStart;
         private GRBLinExpr _cost;  
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
-        private readonly double[,,] _binarySolution;
+        private readonly double[,,] _integerSolution;
+        public GRBModel _model { get; }
+        public List<double> _b { get; }
+        public List<List<double>> _B { get; }
         
-        public SubProblem(GRBEnv env, List<Vehicle> vehicles, List<Customer> vertices, double[,,] binarySolution)
+        public SubProblem(GRBEnv env, List<Vehicle> vehicles, List<Customer> vertices, double[,,] integerSolution)
         {
             _vehicles = vehicles;
             _vertices = vertices;
             _model = new GRBModel(env);
-            _binarySolution = binarySolution;
+            _integerSolution = integerSolution;
+            _b = new List<double>();
+            _B = new List<List<double>>();
             Generate();
-        }
-
-        public GRBModel GetModel()
-        {
-            return _model;
         }
 
         private void Generate()
@@ -73,7 +73,7 @@ namespace VRPTW.Algorithm.Benders
                     for (int e = 0; e < _vertices.Count; e++)
                     {
                         var distance = Helpers.CalculateDistance(_vertices[s], _vertices[e]);
-                        _cost += distance * _binarySolution[v,s,e];
+                        _cost += distance * _integerSolution[v,s,e];
                     }
                 }
             }
@@ -94,15 +94,24 @@ namespace VRPTW.Algorithm.Benders
 
         private void UnAllowedTraverses()
         {
+            var unAllowedTraverses = 0.0;
+            var BRow = new List<double>();
+            BRow.AddRange(Enumerable.Repeat(0.0, _vehicles.Count * _vertices.Count * _vertices.Count));
             for (int v = 0; v < _vehicles.Count; v++)
             {
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    _model.AddConstr(_binarySolution[v,s,s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_S");
-                    _model.AddConstr(_binarySolution[v,s,0], GRB.EQUAL, 0.0, "_UnAllowedTraverses_0");
-                    _model.AddConstr(_binarySolution[v,_vertices.Count - 1,s], GRB.EQUAL, 0.0, "_UnAllowedTraverses_N+1");
+                    unAllowedTraverses += _integerSolution[v, s, s] +
+                                          _integerSolution[v, s, 0] +
+                                          _integerSolution[v, _vertices.Count - 1, s];
+                    BRow[_vertices.Count * _vertices.Count * v + _vertices.Count * s + s] = 1.0;
+                    BRow[_vertices.Count * _vertices.Count * v + _vertices.Count * s] = 1.0;
+                    BRow[_vertices.Count * _vertices.Count * v + _vertices.Count * (_vertices.Count - 1) + s] = 1.0;
                 }
             }
+            _model.AddConstr(unAllowedTraverses, GRB.EQUAL, 0.0, "_UnAllowedTraverses");
+            _b.Add(0.0);
+            _B.Add(BRow);
         }
 
         private void EachCustomerMustBeVisitedOnce()
@@ -110,14 +119,19 @@ namespace VRPTW.Algorithm.Benders
             for (int s = 1; s <= _vertices.Count - 2; s++)
             {
                 var customerVisit = 0.0;
+                var BRow = new List<double>();
+                BRow.AddRange(Enumerable.Repeat(0.0, _vehicles.Count * _vertices.Count * _vertices.Count));
                 for (int v = 0; v < _vehicles.Count; v++)
                 {
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        customerVisit += _binarySolution[v,s,e];
+                        customerVisit += _integerSolution[v,s,e];
+                        BRow[_vehicles.Count * _vertices.Count * s + _vertices.Count * v + e] = 1.0;
                     }
                 }
                 _model.AddConstr(customerVisit, GRB.EQUAL, 1.0, "_EachCustomerMustVisitedOnce");
+                _b.Add(1.0);
+                _B.Add(BRow);
             }
         }
 
@@ -126,11 +140,16 @@ namespace VRPTW.Algorithm.Benders
             for (int v = 0; v < _vehicles.Count; v++)
             {
                 var vehicleStart = 0.0;
+                var BRow = new List<double>();
+                BRow.AddRange(Enumerable.Repeat(0.0, _vehicles.Count * _vertices.Count * _vertices.Count));
                 for (int e = 0; e < _vertices.Count; e++)
                 {
-                    vehicleStart += _binarySolution[v,0,e];
+                    vehicleStart += _integerSolution[v,0,e];
+                    BRow[_vertices.Count * v + e] = 1.0;
                 }
                 _model.AddConstr(vehicleStart, GRB.EQUAL, 1.0, "_AllVehiclesMustStartFromTheDepot");
+                _b.Add(1.0);
+                _B.Add(BRow);
             }
         }
 
@@ -141,7 +160,7 @@ namespace VRPTW.Algorithm.Benders
                 var vehicleEnd = 0.0;
                 for (int s = 0; s < _vertices.Count; s++)
                 {
-                    vehicleEnd += _binarySolution[v,s,_vertices.Count - 1];
+                    vehicleEnd += _integerSolution[v,s,_vertices.Count - 1];
                 }
                 _model.AddConstr(vehicleEnd, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
             }
@@ -157,8 +176,8 @@ namespace VRPTW.Algorithm.Benders
                     var leave = 0.0;
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        arrival += _binarySolution[v,e,s];
-                        leave += _binarySolution[v,s,e];
+                        arrival += _integerSolution[v,e,s];
+                        leave += _integerSolution[v,s,e];
                     }
                     _model.AddConstr(arrival - leave, GRB.EQUAL, 0.0, "_VehiclesMustLeaveTheArrivingCustomer");
                 }
@@ -174,7 +193,7 @@ namespace VRPTW.Algorithm.Benders
                 {
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        vehicleCapacity += _vertices[s].Demand * _binarySolution[v,s,e];
+                        vehicleCapacity += _vertices[s].Demand * _integerSolution[v,s,e];
                     }
                 }
                 _model.AddConstr(vehicleCapacity, GRB.LESS_EQUAL, _vehicles[v].Capacity, "_VehiclesLoadUpCapacity");
@@ -192,7 +211,7 @@ namespace VRPTW.Algorithm.Benders
                         _model.AddConstr(_serviceStart[v][s]
                                         + Helpers.CalculateDistance(_vertices[s], _vertices[e])
                                         + _vertices[s].ServiceTime
-                                        - BigM() * (1 - _binarySolution[v,s,e])
+                                        - BigM() * (1 - _integerSolution[v,s,e])
                                         - _serviceStart[v][e]
                                         , GRB.LESS_EQUAL
                                         , 0.0
