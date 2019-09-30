@@ -1,6 +1,7 @@
 ﻿using Gurobi;
 using System.Collections.Generic;
 using VRPTW.Configuration;
+using VRPTW.Helper;
 using VRPTW.Model;
 
 namespace VRPTW.Algorithm.Benders
@@ -21,23 +22,30 @@ namespace VRPTW.Algorithm.Benders
             Generate();
         }
 
-        public void AddFeasibilityCut(double[] duals, double[] rhs)
+        public void AddFeasibilityCut(Dictionary<(int, int), double> B, List<double> b, List<double> u)
         {
             var expr = new GRBLinExpr();
-            for (int v = 0; v < _vehicles.Count; v++)
+            for (int x = 0; x < u.Count; x++)
             {
-                for (int s = 0; s < _vertices.Count; s++)
+                var row = new GRBLinExpr();
+                for (int v = 0; v < _vehicles.Count; v++)
                 {
-                    for (int e = 0; e < _vertices.Count; e++)
+                    for (int s = 0; s < _vertices.Count; s++)
                     {
-                        expr.AddTerm(1.0, _vehicleTraverse[v][s][e]);
+                        for (int e = 0; e < _vertices.Count; e++)
+                        {
+                            if (!B.TryGetValue((x, _vertices.Count * _vertices.Count * v + _vertices.Count * s + e), out double value))
+                                value = 0.0;
+                            row += value * _vehicleTraverse[v][s][s];
+                        }
                     }
                 }
-            }
-            _model.AddConstr(_z, GRB.GREATER_EQUAL, expr, "");
+                expr += (b[x] - row) * u[x];
+            }                   
+            _model.AddConstr(expr, GRB.LESS_EQUAL, 0.0, "");
         }
 
-        public void AddOptimalityCut(double[] duals, double[] rhs)
+        public void AddOptimalityCut(Dictionary<(int, int), double> B, List<double> b, List<double> u)
         {
             var expr = new GRBLinExpr();
             for (int v = 0; v < _vehicles.Count; v++)
@@ -46,7 +54,8 @@ namespace VRPTW.Algorithm.Benders
                 {
                     for (int e = 0; e < _vertices.Count; e++)
                     {
-                        expr.AddTerm(1.0, _vehicleTraverse[v][s][e]);
+                        var distance = Helpers.CalculateDistance(_vertices[s], _vertices[e]);
+                        expr.AddTerm(distance, _vehicleTraverse[v][s][e]);
                     }
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using Gurobi;
+using System;
 using System.Collections.Generic;
 using VRPTW.Helper;
 using VRPTW.Heuristics;
@@ -31,15 +32,16 @@ namespace VRPTW.Algorithm.Benders
             while (UB - LB > _epsilon)
             {
                 var subProblem = GeneratePrimalSubProblem(integerSolution);
-                List<List<double>> A = subProblem._A;
-                List<List<double>> B = subProblem._B;
+                subProblem._model.Optimize();
+                var A = subProblem._A;
+                var B = subProblem._B;
                 var b = subProblem._b;
                 var c = subProblem._c;
                 var sense = subProblem._sense;
                 var dualProblem = GenerateDualSubProblem(A, b, c, sense);
                 dualProblem._model.Optimize();
-                var status = dualProblem._model.Status;
-                var dualSolution = dualProblem._solution;
+                var status = dualProblem.GetStatus();
+                var dualSolution = dualProblem.GetSolution();
 
                 if (status == GRB.Status.UNBOUNDED)
                 {
@@ -48,6 +50,10 @@ namespace VRPTW.Algorithm.Benders
                 else if (status == GRB.Status.OPTIMAL)
                 {
                     masterProblem.AddOptimalityCut(B, b, dualSolution);
+                }
+                if (subProblem._model.Status == GRB.Status.OPTIMAL)
+                {
+                    UB = Math.Min(UB, subProblem._model.Get(GRB.DoubleAttr.ObjVal));
                 }
                 masterProblem._model.Optimize();
                 integerSolution = masterProblem.GetSolution();
@@ -86,9 +92,9 @@ namespace VRPTW.Algorithm.Benders
             return new PrimalSubProblem(_env, _vehicles, _vertices, integerSolution);
         }
 
-        private DualSubProblem GenerateDualSubProblem(List<List<double>> A, List<double> b, List<double> c, List<char> sense)
+        private DualSubProblem GenerateDualSubProblem(Dictionary<(int, int), double> A, List<double> b, List<double> c, List<char> sense)
         {
-            return new DualSubProblem(_env, _vehicles, _vertices, A, b, c, sense);
+            return new DualSubProblem(_env, A, b, c, sense);
         }
 
         private double[] GetDuals(GRBConstr[] constrs)

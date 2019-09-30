@@ -10,26 +10,36 @@ namespace VRPTW.Algorithm.Benders
     public class DualSubProblem
     {
         private List<GRBVar> _w;
-        private List<Vehicle> _vehicles;
-        private List<Customer> _vertices;
+        private GRBLinExpr _cost = new GRBLinExpr();
         private List<double> _b = new List<double>();
-        private List<List<double>> _A = new List<List<double>>();
+        private Dictionary<(int, int), double> _A = new Dictionary<(int, int), double>();
         private List<double> _c = new List<double>();
         private List<char> _sense = new List<char>();
         public GRBModel _model { get; }
-        public List<double> _solution { get; }
 
-        public DualSubProblem(GRBEnv env, List<Vehicle> vehicles, List<Customer> vertices,
-                              List<List<double>> A, List<double> b, List<double> c, List<char> sense)
+        public DualSubProblem(GRBEnv env, Dictionary<(int, int), double> A, List<double> b, List<double> c, List<char> sense)
         {
-            _vehicles = vehicles;
-            _vertices = vertices;
             _model = new GRBModel(env);
             _b = b;
             _A = A;
             _c = c;
             _sense = sense;
             Generate();
+        }
+
+        public List<double> GetSolution()
+        {
+            var solution = new List<double>();
+            for (int v = 0; v < _b.Count; v++)
+            {
+                solution.Add(_w[v].Get(GRB.DoubleAttr.X));
+            }
+            return solution;
+        }
+
+        public int GetStatus()
+        {
+            return _model.Status;
         }
 
         private void Generate()
@@ -46,6 +56,7 @@ namespace VRPTW.Algorithm.Benders
             _model.Parameters.TimeLimit = Config.GetSolverParam().TimeLimit;
             _model.Parameters.MIPGap = Config.GetSolverParam().MIPGap;
             _model.Parameters.Threads = Config.GetSolverParam().Threads;
+            _model.Parameters.InfUnbdInfo = 1;
         }
 
         private void InitializeDecisionVariables()
@@ -74,5 +85,31 @@ namespace VRPTW.Algorithm.Benders
             }   
         }
 
+        private void CreateObjective()
+        {
+            for (int v = 0; v < _b.Count; v++)
+            {
+                _cost.AddTerm(_b[v], _w[v]);
+            }
+            _model.SetObjective(_cost, GRB.MAXIMIZE);
+        }
+
+        private void CreateConstraints()
+        {
+            for (int v = 0; v < _c.Count; v++)
+            {
+                var line = new GRBLinExpr();
+                for (int k = 0; k < _b.Count; k++)
+                {
+                    if (!_A.TryGetValue((k, v), out double value))
+                    {
+                        value = 0.0;
+                    }
+
+                    line.AddTerm(value, _w[k]);
+                }
+                _model.AddConstr(line, GRB.LESS_EQUAL, _c[v], "CreateConstraints_" + v);
+            }
+        }
     }
 }
