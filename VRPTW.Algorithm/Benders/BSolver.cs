@@ -100,25 +100,5 @@ namespace VRPTW.Algorithm.Benders
         {
             return new DualSubProblem(_env, A, b, ByBar, c, sense);
         }
-
-        private double[] GetDuals(GRBConstr[] constrs)
-        {
-            var duals = new double[constrs.Length];
-            for (var c = 0; c < constrs.Length; c++)
-            {
-                duals[c] = constrs[c].Pi;
-            }
-            return duals;
-        }
-
-        private double[] GetRhs(GRBConstr[] constrs)
-        {
-            var rhs = new double[constrs.Length];
-            for (var c = 0; c < constrs.Length; c++)
-            {
-                rhs[c] = constrs[c].RHS;
-            }
-            return rhs;
-        }
     }
 }
