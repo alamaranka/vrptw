@@ -36,9 +36,10 @@ namespace VRPTW.Algorithm.Benders
                 var A = subProblem._A;
                 var B = subProblem._B;
                 var b = subProblem._b;
+                var ByBar = subProblem._ByBar;
                 var c = subProblem._c;
                 var sense = subProblem._sense;
-                var dualProblem = GenerateDualSubProblem(A, b, c, sense);
+                var dualProblem = GenerateDualSubProblem(A, b, ByBar, c, sense);
                 dualProblem._model.Optimize();
                 var status = dualProblem.GetStatus();
                 var dualSolution = dualProblem.GetSolution();
@@ -51,10 +52,12 @@ namespace VRPTW.Algorithm.Benders
                 {
                     masterProblem.AddOptimalityCut(B, b, dualSolution);
                 }
+
                 if (subProblem._model.Status == GRB.Status.OPTIMAL)
                 {
                     UB = Math.Min(UB, subProblem._model.Get(GRB.DoubleAttr.ObjVal));
                 }
+
                 masterProblem._model.Optimize();
                 integerSolution = masterProblem.GetSolution();
                 LB = masterProblem._model.Get(GRB.DoubleAttr.ObjVal);
@@ -92,9 +95,10 @@ namespace VRPTW.Algorithm.Benders
             return new PrimalSubProblem(_env, _vehicles, _vertices, integerSolution);
         }
 
-        private DualSubProblem GenerateDualSubProblem(Dictionary<(int, int), double> A, List<double> b, List<double> c, List<char> sense)
+        private DualSubProblem GenerateDualSubProblem(Dictionary<(int, int), double> A, List<double> b, 
+                                                      List<double> ByBar, List<double> c, List<char> sense)
         {
-            return new DualSubProblem(_env, A, b, c, sense);
+            return new DualSubProblem(_env, A, b, ByBar, c, sense);
         }
 
         private double[] GetDuals(GRBConstr[] constrs)

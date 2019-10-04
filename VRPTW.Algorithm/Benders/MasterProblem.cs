@@ -1,5 +1,6 @@
 ﻿using Gurobi;
 using System.Collections.Generic;
+using System.Linq;
 using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Model;
@@ -13,6 +14,8 @@ namespace VRPTW.Algorithm.Benders
         private GRBVar _z;       
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
+        private int _numberOfFeasibilityCuts = 0;
+        private int _numberOfOptimalityCuts = 0;
         
         public MasterProblem(GRBEnv env, List<Vehicle> vehicles, List<Customer> vertices)
         {
@@ -22,44 +25,54 @@ namespace VRPTW.Algorithm.Benders
             Generate();
         }
 
-        public void AddFeasibilityCut(Dictionary<(int, int), double> B, List<double> b, List<double> u)
+        public void AddFeasibilityCut(Dictionary<(int, int), double> B, List<double> b, double[] u)
         {
             var expr = new GRBLinExpr();
-            for (int x = 0; x < u.Count; x++)
+            for (int x = 0; x < u.Length; x++)
             {
-                var row = new GRBLinExpr();
-                for (int v = 0; v < _vehicles.Count; v++)
+                var By = new GRBLinExpr();          
+                var elementsWithItem1IsX = B.Where(b => b.Key.Item1 == x).ToList();
+                for (var y = 0; y < elementsWithItem1IsX.Count; y++)
                 {
-                    for (int s = 0; s < _vertices.Count; s++)
-                    {
-                        for (int e = 0; e < _vertices.Count; e++)
-                        {
-                            if (!B.TryGetValue((x, _vertices.Count * _vertices.Count * v + _vertices.Count * s + e), out double value))
-                                value = 0.0;
-                            row += value * _vehicleTraverse[v][s][s];
-                        }
-                    }
+                    var k1 = elementsWithItem1IsX[y].Key.Item1;
+                    var k2 = elementsWithItem1IsX[y].Key.Item2;
+                    if (!B.TryGetValue((k1, k2), out double value))
+                        value = 0.0;
+                    var v = k2 / (_vertices.Count * _vertices.Count);
+                    var s = (k2 % (_vertices.Count * _vertices.Count)) / _vertices.Count;
+                    var e = (k2 % (_vertices.Count * _vertices.Count)) % _vertices.Count;
+                    By += value * _vehicleTraverse[v][s][e];
                 }
-                expr += (b[x] - row) * u[x];
+                expr += (b[x] - By) * u[x];
             }                   
-            _model.AddConstr(expr, GRB.LESS_EQUAL, 0.0, "");
+            _model.AddConstr(expr, GRB.LESS_EQUAL, 0.0, "AddFeasibilityCut_" + _numberOfFeasibilityCuts++);
+            var con = _model.GetConstrs();
+
         }
 
-        public void AddOptimalityCut(Dictionary<(int, int), double> B, List<double> b, List<double> u)
+        public void AddOptimalityCut(Dictionary<(int, int), double> B, List<double> b, double[] u)
         {
             var expr = new GRBLinExpr();
-            for (int v = 0; v < _vehicles.Count; v++)
+            for (int x = 0; x < u.Length; x++)
             {
-                for (int s = 0; s < _vertices.Count; s++)
+                var fy = new GRBLinExpr();
+                var By = new GRBLinExpr();
+                var elementsWithItem1IsX = B.Where(b => b.Key.Item1 == x).ToList();
+                for (var y = 0; y < elementsWithItem1IsX.Count; y++)
                 {
-                    for (int e = 0; e < _vertices.Count; e++)
-                    {
-                        var distance = Helpers.CalculateDistance(_vertices[s], _vertices[e]);
-                        expr.AddTerm(distance, _vehicleTraverse[v][s][e]);
-                    }
+                    var k1 = elementsWithItem1IsX[y].Key.Item1;
+                    var k2 = elementsWithItem1IsX[y].Key.Item2;
+                    if (!B.TryGetValue((k1, k2), out double value))
+                        value = 0.0;
+                    var v = k2 / (_vertices.Count * _vertices.Count);
+                    var s = (k2 % (_vertices.Count * _vertices.Count)) / _vertices.Count;
+                    var e = (k2 % (_vertices.Count * _vertices.Count)) % _vertices.Count;
+                    fy += Helpers.CalculateDistance(_vertices[s], _vertices[e]) * _vehicleTraverse[v][s][e];
+                    By += value * _vehicleTraverse[v][s][e];
                 }
+                expr += fy + (b[x] - By) * u[x];
             }
-            _model.AddConstr(_z, GRB.GREATER_EQUAL, expr, "");
+            _model.AddConstr(_z, GRB.GREATER_EQUAL, expr, "AddOptimalityCut_" + _numberOfOptimalityCuts++);
         }
 
         public double[,,] GetSolution()
