@@ -98,6 +98,7 @@ namespace VRPTW.Algorithm.Benders
             CreateBinaryDecisionVariables();
             CreateGeneralDecisionVariables();
             CreateObjective();
+            CreateConstraints();
         }
 
         private void SetSolverParameters()
@@ -141,6 +142,105 @@ namespace VRPTW.Algorithm.Benders
             var cost = new GRBLinExpr();
             cost.AddTerm(1.0, _z);
             _model.SetObjective(cost, GRB.MINIMIZE);
-        } 
+        }
+
+        private void CreateConstraints()
+        {
+            UnAllowedTraverses();
+            EachCustomerMustBeVisitedOnce();
+            AllVehiclesMustStartFromTheDepot();
+            AllVehiclesMustEndAtTheDepot();
+            VehiclesMustLeaveTheArrivingCustomer();
+            VehiclesLoadUpCapacity();
+        }
+
+        private void UnAllowedTraverses()
+        {
+            var unAllowedTraverses = new GRBLinExpr();
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                for (int s = 0; s < _vertices.Count; s++)
+                {
+                    unAllowedTraverses += _vehicleTraverse[v][s][s] +
+                                          _vehicleTraverse[v][s][0] +
+                                          _vehicleTraverse[v][_vertices.Count - 1][s];
+                }
+            }
+            _model.AddConstr(unAllowedTraverses, GRB.EQUAL, 0.0, "_UnAllowedTraverses");
+        }
+
+        private void EachCustomerMustBeVisitedOnce()
+        {
+            for (int s = 1; s <= _vertices.Count - 2; s++)
+            {
+                var customerVisit = new GRBLinExpr();
+                for (int v = 0; v < _vehicles.Count; v++)
+                {
+                    for (int e = 0; e < _vertices.Count; e++)
+                    {
+                        customerVisit.AddTerm(1.0, _vehicleTraverse[v][s][e]);
+                    }
+                }
+                _model.AddConstr(customerVisit, GRB.EQUAL, 1.0, "_EachCustomerMustVisitedOnce");
+            }
+        }
+
+        private void AllVehiclesMustStartFromTheDepot()
+        {
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                var vehicleStart = new GRBLinExpr();
+                for (int e = 0; e < _vertices.Count; e++)
+                {
+                    vehicleStart.AddTerm(1.0, _vehicleTraverse[v][0][e]);
+                }
+                _model.AddConstr(vehicleStart, GRB.EQUAL, 1.0, "_AllVehiclesMustStartFromTheDepot");
+            }
+        }
+
+        private void AllVehiclesMustEndAtTheDepot()
+        {
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                var vehicleEnd = new GRBLinExpr();
+                for (int s = 0; s < _vertices.Count; s++)
+                {
+                    vehicleEnd.AddTerm(1.0, _vehicleTraverse[v][s][_vertices.Count - 1]);
+                }
+                _model.AddConstr(vehicleEnd, GRB.EQUAL, 1.0, "_AllVehiclesMustEndAtTheDepot");
+            }
+        }
+
+        private void VehiclesMustLeaveTheArrivingCustomer()
+        {
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                for (int s = 1; s <= _vertices.Count - 2; s++)
+                {
+                    var flow = new GRBLinExpr();
+                    for (int e = 0; e < _vertices.Count; e++)
+                    {
+                        flow.Add(_vehicleTraverse[v][e][s] - _vehicleTraverse[v][s][e]);
+                    }
+                    _model.AddConstr(flow, GRB.EQUAL, 0.0, "_VehiclesMustLeaveTheArrivingCustomer");
+                }
+            }
+        }
+
+        private void VehiclesLoadUpCapacity()
+        {
+            for (int v = 0; v < _vehicles.Count; v++)
+            {
+                var vehicleCapacity = new GRBLinExpr();
+                for (int s = 1; s <= _vertices.Count - 2; s++)
+                {
+                    for (int e = 0; e < _vertices.Count; e++)
+                    {
+                        vehicleCapacity.AddTerm(_vertices[s].Demand, _vehicleTraverse[v][s][e]);
+                    }
+                }
+                _model.AddConstr(vehicleCapacity, GRB.LESS_EQUAL, _vehicles[v].Capacity, "_VehiclesLoadUpCapacity");
+            }
+        }
     }
 }
