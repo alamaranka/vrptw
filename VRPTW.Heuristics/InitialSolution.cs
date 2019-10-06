@@ -51,11 +51,13 @@ namespace VRPTW.Heuristics
                 routes.Add(route);
             }
             ResetReturningDepotName(routes);
-            return new Solution()
+            var solution = new Solution()
             {
                 Routes = routes,
                 Cost = routes.Sum(d => d.Distance)
             };
+            new TwoOptOperator(solution);
+            return solution;
         }
 
         private void ResetReturningDepotName(List<Route> routes)
