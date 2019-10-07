@@ -27,7 +27,7 @@ namespace VRPTW.Runner
                     solution = new BSolver(dataset).Run();
                     break;
                 case "Heuristics":
-                    solution = new InitialSolution(dataset).Get();
+                    solution = new HSolver(dataset).Run();
                     break;
                 default:
                     break;

@@ -28,12 +28,15 @@ namespace VRPTW.Heuristics
         {
             SetInputData();
             var routes = new List<Route>();
+
             while (_unRoutedCustomers.Count > 0)
             {
-                var route = new RouteGenerator(_depot, _unRoutedCustomers, _routeMaxCapacity).Generate();
+                var route = new InsertionHeuristics(_depot, _unRoutedCustomers, _routeMaxCapacity).Generate();
+                route.Id = routes.Count;
                 routes.Add(route);
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
+
             var numberOfRemainingVehicles = _dataset.Vehicles.Count - routes.Count;
             for (var i = 0; i < numberOfRemainingVehicles; i++)
             {
@@ -44,20 +47,22 @@ namespace VRPTW.Heuristics
                 };
                 var route = new Route()
                 {
-                    Id = i,
+                    Id = routes.Count,
                     Customers = customers,
                     Load = 0.0,
                     Distance = 0.0
                 };
                 routes.Add(route);
             }
+
             ResetReturningDepotName(routes);
+
             var solution = new Solution()
             {
                 Routes = routes,
                 Cost = routes.Sum(d => d.Distance)
             };
-            new TwoOptOperator(solution);
+
             return solution;
         }
 

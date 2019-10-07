@@ -7,14 +7,14 @@ using VRPTW.Model;
 
 namespace VRPTW.Heuristics
 {
-    public class RouteGenerator
+    public class InsertionHeuristics
     {
         private readonly Customer _depot;
         private readonly List<Customer> _candidateCustomers;
         private readonly double _routeMaxCapacity;
         public Route _route;
 
-        public RouteGenerator(Customer depot, List<Customer> unRoutedCustomers, double routeMaxCapacity)
+        public InsertionHeuristics(Customer depot, List<Customer> unRoutedCustomers, double routeMaxCapacity)
         {
             _depot = depot;
             _candidateCustomers = unRoutedCustomers;
@@ -113,25 +113,24 @@ namespace VRPTW.Heuristics
 
         private double InsertionValueOfCustomer(Customer previous, Customer candidate, Customer next)
         {
-            //var alpha1 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha1;
-            //var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
-            //var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
-            //var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
-            //var c11 = Helpers.CalculateDistance(previous, candidate) +
-            //          Helpers.CalculateDistance(candidate, next) -
-            //          Helpers.CalculateDistance(previous, next) * mu;
-            //var candidateStartTime = Math.Max(previous.ServiceStart +
-            //                         previous.ServiceTime +
-            //                         Helpers.CalculateDistance(previous, candidate),
-            //                         candidate.TimeStart);
-            //var c12 = Math.Max(candidateStartTime +
-            //          candidate.ServiceTime +
-            //          Helpers.CalculateDistance(candidate, next),
-            //          candidate.TimeStart) -
-            //          next.ServiceStart;
-            //var c1 = alpha1 * c11 + alpha2 * c12;
-            //return lambda * Helpers.CalculateDistance(_depot, candidate) - c1;
-            return 0.0;
+            var alpha1 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha1;
+            var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
+            var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
+            var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
+            var c11 = Helpers.CalculateDistance(previous, candidate) +
+                      Helpers.CalculateDistance(candidate, next) -
+                      Helpers.CalculateDistance(previous, next) * mu;
+            var candidateStartTime = Math.Max(previous.ServiceStart +
+                                     previous.ServiceTime +
+                                     Helpers.CalculateDistance(previous, candidate),
+                                     candidate.TimeStart);
+            var c12 = Math.Max(candidateStartTime +
+                      candidate.ServiceTime +
+                      Helpers.CalculateDistance(candidate, next),
+                      candidate.TimeStart) -
+                      next.ServiceStart;
+            var c1 = alpha1 * c11 + alpha2 * c12;
+            return lambda * Helpers.CalculateDistance(_depot, candidate) - c1;
         }
 
         private Customer GetSeedCustomer()

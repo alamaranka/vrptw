@@ -10,48 +10,43 @@ namespace VRPTW.Heuristics
     public class TwoOptOperator
     {
         public Solution _solution;
-        private Route _route;
 
         public TwoOptOperator(Solution solution)
         {
             _solution = solution;
-            _route = new Route();
             Apply2OptOperator();
         }
 
         private void Apply2OptOperator()
         {
-            var routeCount = 1;
-            var newRoutes = new List<Route>();
-
             foreach (var route in _solution.Routes.Where(r => r.Customers.Count > 2))
             {
                 var improved = true;
-                var clone = Helpers.Clone(route);
+                Console.WriteLine("---------- Analyzing Route {0} ----------", route.Id);
 
                 while (improved)
                 {
                     improved = false;
-                    Console.WriteLine("Route {0} -------------", routeCount++);
                     for (var i = 1; i < route.Customers.Count - 2; i++)
                     {
                         for (var j = i + 1; j < route.Customers.Count - 1; j++)
                         {
-                            var currentDistance = clone.Distance;
-                            Console.Write("Swapping {0} with {1}: ", route.Customers[i].Name, route.Customers[j].Name);
-                            var temp = GenerateNewRoute(clone, i, j);
-                            if (temp.Item1)
+                            var currentDistance = route.Distance;
+                            Console.Write("Swapping {0} with {1}: ",
+                                          route.Customers[i].Name, route.Customers[j].Name);
+                            var tempRoute = GenerateNewRoute(Helpers.Clone(route), i, j);
+                            if (tempRoute != null)
                             {
-                                if (clone.Distance < currentDistance)
+                                if (tempRoute.Distance < currentDistance)
                                 {
-                                    Console.Write("Route distance reduced from {0} to {1}. Net of {2} improvement!", 
-                                        currentDistance, clone.Distance, currentDistance - clone.Distance);
+                                    Console.Write("Route distance reduced from {0} to {1}!", 
+                                                  Math.Round(currentDistance, 2), Math.Round(tempRoute.Distance, 2));
+                                    UpdateRoute(route, tempRoute);
                                     improved = true;
-                                    clone = temp.Item2;
                                 }
                                 else
                                 {
-                                    Console.Write("Feasible but no improvement!");
+                                    Console.Write("Feasible, but no improvement!");
                                 }
                             }
                             else 
@@ -62,45 +57,48 @@ namespace VRPTW.Heuristics
                         }
                     }
                 }
-
-                newRoutes.Add(clone);
             }
 
-            for (var i = 0; i < newRoutes.Count; i++)
-            {
-                _solution.Routes[i] = newRoutes[i];
-            }
+            _solution.Cost = _solution.Routes.Sum(r => r.Distance);
         }
         
-        private (bool, Route) GenerateNewRoute(Route route, int i, int j)
+        private Route GenerateNewRoute(Route route, int i, int j)
         {
-            var clone = Helpers.Clone(route);
             var distance = 0.0;
             var customersInNewOrder = new List<Customer>();
-            var opt = clone.Customers.GetRange(i, j - i + 1);
+            var opt = route.Customers.GetRange(i, j - i + 1);
             opt.Reverse();
             customersInNewOrder.AddRange(opt);
-            customersInNewOrder.AddRange(clone.Customers.GetRange(j + 1, clone.Customers.Count - j - 1));
+            customersInNewOrder.AddRange(route.Customers.GetRange(j + 1, route.Customers.Count - j - 1));
 
-            for (var x = 0; x < i - 1; x++)
+            for (var c = 0; c < i - 1; c++)
             {
-                distance += Helpers.CalculateDistance(clone.Customers[x], clone.Customers[x + 1]);
+                distance += Helpers.CalculateDistance(route.Customers[c], route.Customers[c + 1]);
             }
 
-            var count = 0;
-            for (var x = i; x < clone.Customers.Count; x++)
+            for (var c = i; c < route.Customers.Count; c++)
             {
-                var customer = customersInNewOrder[count++];
-                customer.ServiceStart = Helpers.CalculateServiceStart(clone.Customers[x - 1], customer);
+                var customer = customersInNewOrder[c - i];
+                customer.ServiceStart = Helpers.CalculateServiceStart(route.Customers[c - 1], customer);
                 if (customer.ServiceStart < customer.TimeStart || customer.ServiceStart > customer.TimeEnd)
                 {
-                    return (false, null);
+                    return null;
                 }
-                clone.Customers[x] = customersInNewOrder[x - i];
-                distance += Helpers.CalculateDistance(clone.Customers[x - 1], clone.Customers[x]);
+                route.Customers[c] = customersInNewOrder[c - i];
+                distance += Helpers.CalculateDistance(route.Customers[c - 1], route.Customers[c]);
             }
-            clone.Distance = distance;
-            return (true, clone);
+            route.Distance = distance;
+
+            return route;
+        }
+
+        private void UpdateRoute(Route route, Route tempRoute)
+        {
+            for (var c = 0; c < tempRoute.Customers.Count; c++)
+            {
+                route.Customers[c] = tempRoute.Customers[c];
+            }
+            route.Distance = tempRoute.Distance;
         }
     }
 }
