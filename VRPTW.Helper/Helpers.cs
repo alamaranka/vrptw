@@ -53,5 +53,13 @@ namespace VRPTW.Helper
             }
             return vehicleTraverse;
         }
+
+        public static double CalculateServiceStart(Customer previous, Customer next)
+        {
+            return Math.Max(next.TimeStart,
+                   previous.ServiceStart +
+                   previous.ServiceTime +
+                   Helpers.CalculateDistance(previous, next));
+        }
     }
 }

@@ -44,6 +44,7 @@ namespace VRPTW.Heuristics
                 };
                 var route = new Route()
                 {
+                    Id = i,
                     Customers = customers,
                     Load = 0.0,
                     Distance = 0.0

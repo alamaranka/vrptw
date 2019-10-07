@@ -77,7 +77,7 @@ namespace VRPTW.Heuristics
             _route.Customers.Insert(_route.Customers.IndexOf(next), candidate);
             for (var p = _route.Customers.IndexOf(candidate); p < _route.Customers.Count; p++)
             {
-                _route.Customers[p].ServiceStart = CalculateServiceStart(_route.Customers[p - 1], _route.Customers[p]);
+                _route.Customers[p].ServiceStart = Helpers.CalculateServiceStart(_route.Customers[p - 1], _route.Customers[p]);
             }
             _route.Load += candidate.Demand;
             _route.Distance = _route.Distance -
@@ -99,7 +99,7 @@ namespace VRPTW.Heuristics
 
             for (var p = candidateRoute.Customers.IndexOf(candidate); p < candidateRoute.Customers.Count; p++)
             {
-                var newServiceStartTime = CalculateServiceStart(candidateRoute.Customers[p - 1], candidateRoute.Customers[p]);
+                var newServiceStartTime = Helpers.CalculateServiceStart(candidateRoute.Customers[p - 1], candidateRoute.Customers[p]);
                 var isBeforeTimeStart = newServiceStartTime < candidateRoute.Customers[p].TimeStart;
                 var isAfterTimeEnd = newServiceStartTime > candidateRoute.Customers[p].TimeEnd;
                 candidateRoute.Customers[p].ServiceStart = newServiceStartTime;
@@ -111,34 +111,27 @@ namespace VRPTW.Heuristics
             return true;
         }
 
-        private double CalculateServiceStart(Customer previous, Customer next)
-        {
-            return Math.Max(next.TimeStart,
-                   previous.ServiceStart +
-                   previous.ServiceTime +
-                   Helpers.CalculateDistance(previous, next));
-        }
-
         private double InsertionValueOfCustomer(Customer previous, Customer candidate, Customer next)
         {
-            var alpha1 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha1;
-            var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
-            var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
-            var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
-            var c11 = Helpers.CalculateDistance(previous, candidate) +
-                      Helpers.CalculateDistance(candidate, next) -
-                      Helpers.CalculateDistance(previous, next) * mu;
-            var candidateStartTime = Math.Max(previous.ServiceStart +
-                                     previous.ServiceTime +
-                                     Helpers.CalculateDistance(previous, candidate),
-                                     candidate.TimeStart);
-            var c12 = Math.Max(candidateStartTime +
-                      candidate.ServiceTime +
-                      Helpers.CalculateDistance(candidate, next),
-                      candidate.TimeStart) -
-                      next.ServiceStart;
-            var c1 = alpha1 * c11 + alpha2 * c12;
-            return lambda * Helpers.CalculateDistance(_depot, candidate) - c1;
+            //var alpha1 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha1;
+            //var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
+            //var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
+            //var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
+            //var c11 = Helpers.CalculateDistance(previous, candidate) +
+            //          Helpers.CalculateDistance(candidate, next) -
+            //          Helpers.CalculateDistance(previous, next) * mu;
+            //var candidateStartTime = Math.Max(previous.ServiceStart +
+            //                         previous.ServiceTime +
+            //                         Helpers.CalculateDistance(previous, candidate),
+            //                         candidate.TimeStart);
+            //var c12 = Math.Max(candidateStartTime +
+            //          candidate.ServiceTime +
+            //          Helpers.CalculateDistance(candidate, next),
+            //          candidate.TimeStart) -
+            //          next.ServiceStart;
+            //var c1 = alpha1 * c11 + alpha2 * c12;
+            //return lambda * Helpers.CalculateDistance(_depot, candidate) - c1;
+            return 0.0;
         }
 
         private Customer GetSeedCustomer()
