@@ -18,6 +18,7 @@ namespace VRPTW.Heuristics
         {
             var solution = new InitialSolution(_dataset).Get();
             new TwoOptOperator(solution);
+            new SwapOperator(solution);
             return solution;
         }
     }
