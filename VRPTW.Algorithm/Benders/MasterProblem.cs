@@ -31,7 +31,7 @@ namespace VRPTW.Algorithm.Benders
             for (int x = 0; x < u.Length; x++)
             {
                 var By = new GRBLinExpr();          
-                var elementsWithItem1IsX = B.Where(b => b.Key.Item1 == x).ToList();
+                var elementsWithItem1IsX = B.Where(e => e.Key.Item1 == x).ToList();
                 for (var y = 0; y < elementsWithItem1IsX.Count; y++)
                 {
                     var k1 = elementsWithItem1IsX[y].Key.Item1;
@@ -57,7 +57,7 @@ namespace VRPTW.Algorithm.Benders
             {
                 var fy = new GRBLinExpr();
                 var By = new GRBLinExpr();
-                var elementsWithItem1IsX = B.Where(b => b.Key.Item1 == x).ToList();
+                var elementsWithItem1IsX = B.Where(e => e.Key.Item1 == x).ToList();
                 for (var y = 0; y < elementsWithItem1IsX.Count; y++)
                 {
                     var k1 = elementsWithItem1IsX[y].Key.Item1;

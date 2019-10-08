@@ -8,6 +8,6 @@ namespace VRPTW.Algorithm
 {
     public interface IAlgorithm
     {
-        public Solution Run(); 
+        Solution Run(); 
     }
 }
