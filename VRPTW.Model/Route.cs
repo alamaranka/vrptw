@@ -8,6 +8,7 @@ namespace VRPTW.Model
     {
         public int Id { get; set; }
         public Vehicle Vehicle { get; set; }
+        public double Capacity { get; set; }
         public List<Customer> Customers { get; set; }
         public double Load { get; set; }
         public double Distance { get; set; }

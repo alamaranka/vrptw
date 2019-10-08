@@ -27,14 +27,18 @@ namespace VRPTW.Heuristics
                 while (improved)
                 {
                     improved = false;
+
                     for (var i = 1; i < route.Customers.Count - 2; i++)
                     {
                         for (var j = i + 1; j < route.Customers.Count - 1; j++)
                         {
-                            var currentDistance = route.Distance;
                             Console.Write("Swapping {0} with {1}: ",
                                           route.Customers[i].Name, route.Customers[j].Name);
+
+                            var currentDistance = route.Distance;
+                            
                             var tempRoute = GenerateNewRoute(Helpers.Clone(route), i, j);
+
                             if (tempRoute != null)
                             {
                                 if (tempRoute.Distance < currentDistance)

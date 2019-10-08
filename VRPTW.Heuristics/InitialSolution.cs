@@ -49,6 +49,7 @@ namespace VRPTW.Heuristics
                 {
                     Id = routes.Count,
                     Customers = customers,
+                    Capacity = _routeMaxCapacity,
                     Load = 0.0,
                     Distance = 0.0
                 };
