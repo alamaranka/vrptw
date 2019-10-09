@@ -24,11 +24,11 @@ namespace VRPTW.Heuristics
             while (improved)
             {
                 improved = false;
-                var numberOFActualRoutes = _solution.Routes.Select(r => r.Customers.Count > 2).Count();
+                var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
-                for (var r1 = 0; r1 < numberOFActualRoutes - 1; r1++)
+                for (var r1 = 0; r1 < numberOfActualRoutes - 1; r1++)
                 {
-                    for (var r2 = r1 + 1; r2 < numberOFActualRoutes; r2++)
+                    for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
                     {
                         Console.WriteLine("---------- Analyzing Route {0} and Route {1} ----------", 
                                           _solution.Routes[r1].Id,
@@ -114,16 +114,17 @@ namespace VRPTW.Heuristics
 
         private bool IsFeasibleToInsert(Route route, Customer current, Customer candidate)
         {
-            var indexOfInsertion = route.Customers.IndexOf(current) + 1;
-            route.Customers.Remove(current);
-            route.Distance -= current.Demand;
+            var currentInRoute = route.Customers.Where(c => c.Name == current.Name).FirstOrDefault();
+            var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
+            route.Customers.Remove(currentInRoute);
+            route.Load -= currentInRoute.Demand;
 
             if (route.Load + candidate.Demand > route.Capacity)
             {
                 return false;
             }
 
-            route.Customers.Insert(indexOfInsertion, candidate);
+            route.Customers.Insert(indexOfCurrent, candidate);
 
             for (var p = route.Customers.IndexOf(candidate); p < route.Customers.Count; p++)
             {

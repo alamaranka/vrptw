@@ -11,14 +11,14 @@ namespace VRPTW.Heuristics
     {
         private readonly Customer _depot;
         private readonly List<Customer> _candidateCustomers;
-        private readonly double _routeMaxCapacity;
+        private readonly double _routeCapacity;
         public Route _route;
 
-        public InsertionHeuristics(Customer depot, List<Customer> unRoutedCustomers, double routeMaxCapacity)
+        public InsertionHeuristics(Customer depot, List<Customer> unRoutedCustomers, double routeCapacity)
         {
             _depot = depot;
             _candidateCustomers = unRoutedCustomers;
-            _routeMaxCapacity = routeMaxCapacity;
+            _routeCapacity = routeCapacity;
         }
 
         public Route Generate()
@@ -89,7 +89,7 @@ namespace VRPTW.Heuristics
 
         private bool IsFeasibleToInsert(Customer candidate, Customer next)
         {
-            if (_route.Load + candidate.Demand > _routeMaxCapacity)
+            if (_route.Load + candidate.Demand > _routeCapacity)
             {
                 return false;
             }

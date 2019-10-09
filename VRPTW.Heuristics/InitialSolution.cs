@@ -10,7 +10,7 @@ namespace VRPTW.Heuristics
         private readonly Dataset _dataset;
         private Customer _depot;
         private List<Customer> _unRoutedCustomers;
-        private double _routeMaxCapacity;
+        private double _routeCapacity;
 
         public InitialSolution(Dataset dataset)
         {
@@ -21,7 +21,7 @@ namespace VRPTW.Heuristics
         {
             _depot = _dataset.Vertices[0];
             _unRoutedCustomers = _dataset.Vertices.GetRange(1, _dataset.Vertices.Count - 1);
-            _routeMaxCapacity = _dataset.Vehicles[0].Capacity;
+            _routeCapacity = _dataset.Vehicles[0].Capacity;
         }
 
         public Solution Get()
@@ -31,8 +31,9 @@ namespace VRPTW.Heuristics
 
             while (_unRoutedCustomers.Count > 0)
             {
-                var route = new InsertionHeuristics(_depot, _unRoutedCustomers, _routeMaxCapacity).Generate();
+                var route = new InsertionHeuristics(_depot, _unRoutedCustomers, _routeCapacity).Generate();
                 route.Id = routes.Count;
+                route.Capacity = _routeCapacity;
                 routes.Add(route);
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
@@ -49,7 +50,7 @@ namespace VRPTW.Heuristics
                 {
                     Id = routes.Count,
                     Customers = customers,
-                    Capacity = _routeMaxCapacity,
+                    Capacity = _routeCapacity,
                     Load = 0.0,
                     Distance = 0.0
                 };
