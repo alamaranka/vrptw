@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using VRPTW.Model;
@@ -15,6 +16,7 @@ namespace VRPTW.Helper
             return Math.Sqrt(term1 + term2);
         }
 
+        [DebuggerStepThrough]
         public static T Clone<T> (T source)
         {
             if (!typeof(T).IsSerializable)

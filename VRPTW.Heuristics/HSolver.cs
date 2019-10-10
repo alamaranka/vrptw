@@ -17,8 +17,21 @@ namespace VRPTW.Heuristics
         public Solution Run()
         {
             var solution = new InitialSolution(_dataset).Get();
-            new TwoOptOperator(solution);
-            new SwapOperator(solution);
+
+            //var improved = true;
+            //while (improved)
+            //{
+            //    improved = false;
+            //    var cost = solution.Cost;
+                new TwoOptOperator(solution);
+                new SwapOperator(solution);
+
+            //    if (solution.Cost < cost)
+            //    {
+            //        improved = true;
+            //    }
+            //}
+           
             return solution;
         }
     }
