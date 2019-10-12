@@ -7,11 +7,11 @@ using VRPTW.Model;
 
 namespace VRPTW.Heuristics
 {
-    public class SwapOperator
+    public class ExchangeOperator
     {
         public Solution _solution;
 
-        public SwapOperator(Solution solution)
+        public ExchangeOperator(Solution solution)
         {
             _solution = solution;
             ApplySwapOperator();
@@ -45,9 +45,11 @@ namespace VRPTW.Heuristics
 
                                 var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
                                 var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
+                                var customerInRoute1 = cloneOfRoute1.Customers[i];
+                                var customerInRoute2 = cloneOfRoute2.Customers[j];
 
-                                var newRoute1 = RemoveCurrentInsertCandidate(cloneOfRoute1, cloneOfRoute1.Customers[i], cloneOfRoute2.Customers[j]);
-                                var newRoute2 = RemoveCurrentInsertCandidate(cloneOfRoute2, cloneOfRoute2.Customers[j], cloneOfRoute1.Customers[i]);
+                                var newRoute1 = ApplyOperator(cloneOfRoute1, customerInRoute1, customerInRoute2);
+                                var newRoute2 = ApplyOperator(cloneOfRoute2, customerInRoute2, customerInRoute1);
 
                                 if (newRoute1 != null && newRoute2 != null)
                                 {
@@ -76,11 +78,10 @@ namespace VRPTW.Heuristics
                     }
                 }
             }
-
             _solution.Cost = _solution.Routes.Sum(r => r.Distance);
         }
 
-        private Route RemoveCurrentInsertCandidate(Route route, Customer current, Customer candidate)
+        private Route ApplyOperator(Route route, Customer current, Customer candidate)
         {
             var currentInRoute = route.Customers.Where(c => c.Name == current.Name).FirstOrDefault();
             var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
@@ -88,7 +89,7 @@ namespace VRPTW.Heuristics
             route.Customers.Remove(currentInRoute);
             route.Customers.Insert(indexOfCurrent, candidate);
 
-            var constructedRoute = ConstructRoute(route);
+            var constructedRoute = Helpers.ConstructRoute(route);
             var isFeasible = constructedRoute.Item1;
             var newRoute = constructedRoute.Item2;
 
@@ -97,44 +98,7 @@ namespace VRPTW.Heuristics
                 return newRoute;
             }
 
-            return null;
-        }
-
-        private (bool, Route) ConstructRoute(Route route)
-        {
-            var load = 0.0;
-            var distance = 0.0;
-
-            for (var c = 1; c < route.Customers.Count; c++)
-            {
-                route.Customers[c].ServiceStart = Helpers.CalculateServiceStart(route.Customers[c - 1], route.Customers[c]);
-                load += route.Customers[c].Demand;
-                distance += Helpers.CalculateDistance(route.Customers[c - 1], route.Customers[c]);
-                
-                if (!IsFeasible(route, load, c))
-                {
-                    return (false, null);
-                }
-            }
-
-            route.Load = load;
-            route.Distance = distance;
-
-            return (true, route);
-        }
-
-        private bool IsFeasible(Route route, double load, int c)
-        {
-            var isCapacityExceeded = load > route.Capacity;
-            var isBeforeTimeStart = route.Customers[c].ServiceStart < route.Customers[c].TimeStart;
-            var isAfterTimeEnd = route.Customers[c].ServiceStart > route.Customers[c].TimeEnd;
-
-            if (isCapacityExceeded || isBeforeTimeStart || isAfterTimeEnd)
-            {
-                return false;
-            }
-
-            return true;
+            return newRoute;
         }
     }
 }

@@ -63,5 +63,42 @@ namespace VRPTW.Helper
                    previous.ServiceTime +
                    Helpers.CalculateDistance(previous, next));
         }
+
+        public static (bool, Route) ConstructRoute(Route route)
+        {
+            var load = 0.0;
+            var distance = 0.0;
+
+            for (var c = 1; c < route.Customers.Count; c++)
+            {
+                route.Customers[c].ServiceStart = Helpers.CalculateServiceStart(route.Customers[c - 1], route.Customers[c]);
+                load += route.Customers[c].Demand;
+                distance += Helpers.CalculateDistance(route.Customers[c - 1], route.Customers[c]);
+
+                if (!IsFeasible(route, load, c))
+                {
+                    return (false, null);
+                }
+            }
+
+            route.Load = load;
+            route.Distance = distance;
+
+            return (true, route);
+        }
+
+        public static bool IsFeasible(Route route, double load, int c)
+        {
+            var isCapacityExceeded = load > route.Capacity;
+            var isBeforeTimeStart = route.Customers[c].ServiceStart < route.Customers[c].TimeStart;
+            var isAfterTimeEnd = route.Customers[c].ServiceStart > route.Customers[c].TimeEnd;
+
+            if (isCapacityExceeded || isBeforeTimeStart || isAfterTimeEnd)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

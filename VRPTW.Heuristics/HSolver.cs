@@ -18,20 +18,20 @@ namespace VRPTW.Heuristics
         {
             var solution = new InitialSolution(_dataset).Get();
 
-            //var improved = true;
-            //while (improved)
-            //{
-            //    improved = false;
-            //    var cost = solution.Cost;
+            var improved = true;
+            while (improved)
+            {
+                improved = false;
+                var cost = solution.Cost;
                 new TwoOptOperator(solution);
-                new SwapOperator(solution);
+                new ExchangeOperator(solution);
 
-            //    if (solution.Cost < cost)
-            //    {
-            //        improved = true;
-            //    }
-            //}
-           
+                if (solution.Cost < cost)
+                {
+                    improved = true;
+                }
+            }
+
             return solution;
         }
     }
