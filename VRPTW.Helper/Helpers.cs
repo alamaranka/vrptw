@@ -90,10 +90,9 @@ namespace VRPTW.Helper
         public static bool IsFeasible(Route route, double load, int c)
         {
             var isCapacityExceeded = load > route.Capacity;
-            var isBeforeTimeStart = route.Customers[c].ServiceStart < route.Customers[c].TimeStart;
             var isAfterTimeEnd = route.Customers[c].ServiceStart > route.Customers[c].TimeEnd;
 
-            if (isCapacityExceeded || isBeforeTimeStart || isAfterTimeEnd)
+            if (isCapacityExceeded || isAfterTimeEnd)
             {
                 return false;
             }

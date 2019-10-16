@@ -100,10 +100,9 @@ namespace VRPTW.Heuristics
             for (var p = candidateRoute.Customers.IndexOf(candidate); p < candidateRoute.Customers.Count; p++)
             {
                 var newServiceStartTime = Helpers.CalculateServiceStart(candidateRoute.Customers[p - 1], candidateRoute.Customers[p]);
-                var isBeforeTimeStart = newServiceStartTime < candidateRoute.Customers[p].TimeStart;
                 var isAfterTimeEnd = newServiceStartTime > candidateRoute.Customers[p].TimeEnd;
                 candidateRoute.Customers[p].ServiceStart = newServiceStartTime;
-                if (isBeforeTimeStart || isAfterTimeEnd)
+                if (isAfterTimeEnd)
                 {
                     return false;
                 }
