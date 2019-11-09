@@ -72,7 +72,7 @@ namespace VRPTW.Heuristics
         {
             foreach (var r in routes)
             {
-                r.Customers.Last().Name = _dataset.Vertices.Count;
+                r.Customers.Last().Id = _dataset.Vertices.Count;
             }
         }
     }

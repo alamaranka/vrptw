@@ -19,10 +19,17 @@ namespace VRPTW.Algorithm
         private readonly Dataset _dataset;
         private List<Vehicle> _vehicles;
         private List<Customer> _vertices;
+        private Solution _initialSolution;
 
         public GSolver(Dataset dataset)
         {
             _dataset = dataset;
+        }
+
+        public GSolver(Dataset dataset, Solution solution)
+        {
+            _dataset = dataset;
+            _initialSolution = solution;
         }
 
         public Solution Run()
@@ -36,8 +43,26 @@ namespace VRPTW.Algorithm
             CreateGeneralDecisionVariables();
             CreateObjective();
             CreateConstraints();
+            SetInitialSolution();
             Solve();
             return Output();
+        }
+
+        private void SetInitialSolution()
+        {
+            for (int r = 0; r < _initialSolution.Routes.Count; r++)
+            {
+                var customers = _initialSolution.Routes[r].Customers;
+                var current = customers[0].Id;
+                _serviceStart[r][0].Start = customers[0].ServiceStart;
+
+                for (int c = 1; c < customers.Count; c++)
+                {
+                    _vehicleTraverse[r][current][customers[c].Id].Start = 1.0;
+                    _serviceStart[r][c].Start = customers[c].ServiceStart;
+                    current = customers[c].Id;
+                }
+            }
         }
 
         private void SetInputData()

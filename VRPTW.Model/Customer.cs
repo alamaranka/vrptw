@@ -5,7 +5,7 @@ namespace VRPTW.Model
     [Serializable]
     public class Customer
     {
-        public int Name { get; set; }
+        public int Id { get; set; }
         public int Latitude { get; set; }
         public int Longitude { get; set; }
         public int Demand { get; set; }

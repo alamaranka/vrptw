@@ -3,7 +3,9 @@ namespace VRPTW.Configuration
 {
     public class FileOperation
     {
-        public string FilePath { get; set; }
-        public string FileName { get; set; }
+        public string InstancePath { get; set; }
+        public string InstanceName { get; set; }
+        public string OutputPath { get; set; }
+        public string OutputName { get; set; }
     }
 }

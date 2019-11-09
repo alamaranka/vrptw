@@ -21,10 +21,11 @@ namespace VRPTW.Heuristics
         {
             var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
+            Console.WriteLine("Applying 2-Opt Operator" + new string('.', 10));
+
             for (var r = 0; r < numberOfActualRoutes; r++)
             {
                 var improved = true;
-                Console.WriteLine("---------- Analyzing Route {0} ----------", _solution.Routes[r].Id);
 
                 while (improved)
                 {
@@ -34,32 +35,19 @@ namespace VRPTW.Heuristics
                     {
                         for (var j = i + 1; j < _solution.Routes[r].Customers.Count - 1; j++)
                         {
-                            Console.Write("Reversing {0} - {1}: ",
-                                          _solution.Routes[r].Customers[i].Name, _solution.Routes[r].Customers[j].Name);
-
-                            var currentDistance = _solution.Routes[r].Distance;
-                            
+                            var currentDistance = _solution.Routes[r].Distance;                            
                             var newRoute = ApplyOperator(Helpers.Clone(_solution.Routes[r]), i, j);
 
                             if (newRoute != null)
                             {
                                 if (newRoute.Distance < currentDistance)
                                 {
-                                    Console.Write("Route distance reduced from {0} to {1}!", 
-                                                  Math.Round(currentDistance, 2), Math.Round(newRoute.Distance, 2));
+                                    Console.WriteLine("Distance of Route{0} reduced from {1} to {2} as a result of {3}<->{4}.", 
+                                                      r, Math.Round(currentDistance, 2), Math.Round(newRoute.Distance, 2), i, j);
                                     _solution.Routes[r] = newRoute;
                                     improved = true;
                                 }
-                                else
-                                {
-                                    Console.Write("Feasible, but no improvement!");
-                                }
                             }
-                            else 
-                            {
-                                Console.Write("Not feasible to swap!");
-                            }
-                            Console.WriteLine();
                         }
                     }
                 }

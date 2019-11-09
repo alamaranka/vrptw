@@ -23,7 +23,7 @@ namespace VRPTW.Data
             {
                 var customer = new Customer
                 {
-                    Name = (int)dataTable.Rows[row].ItemArray[1],
+                    Id = (int)dataTable.Rows[row].ItemArray[1],
                     Latitude = (int)dataTable.Rows[row].ItemArray[2],
                     Longitude = (int)dataTable.Rows[row].ItemArray[3],
                     Demand = (int)dataTable.Rows[row].ItemArray[4],

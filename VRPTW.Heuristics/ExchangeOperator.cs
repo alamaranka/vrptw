@@ -21,6 +21,8 @@ namespace VRPTW.Heuristics
         {
             var improved = true;
 
+            Console.WriteLine("Applying Exchange Operator" + new string('.', 10));
+
             while (improved)
             {
                 improved = false;
@@ -30,19 +32,11 @@ namespace VRPTW.Heuristics
                 {
                     for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
                     {
-                        Console.WriteLine("---------- Analyzing Route {0} and Route {1} ----------", 
-                                          _solution.Routes[r1].Id,
-                                          _solution.Routes[r2].Id);
                         for (var i = 1; i < _solution.Routes[r1].Customers.Count - 1; i++)
                         {
                             for (var j = 1; j < _solution.Routes[r2].Customers.Count - 1; j++)
                             {
-                                Console.Write("Swapping Route {0}-{1} with Route {2}-{3}: ",
-                                               _solution.Routes[r1].Id, _solution.Routes[r1].Customers[i].Name,
-                                               _solution.Routes[r2].Id, _solution.Routes[r2].Customers[j].Name);
-
                                 var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
-
                                 var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
                                 var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
                                 var customerInRoute1 = cloneOfRoute1.Customers[i];
@@ -55,24 +49,15 @@ namespace VRPTW.Heuristics
                                 {
                                     if (newRoute1.Distance + newRoute2.Distance < currentDistance)
                                     {
-                                        Console.Write("Sum of 2 routes distance reduced from {0} to {1}!",
-                                                      Math.Round(currentDistance, 2), 
-                                                      Math.Round(newRoute1.Distance + newRoute2.Distance, 2));
+                                        Console.WriteLine("Total distance of Routes {0} and {1} reduced from {2} to {3} as a result of {4}-{5}<->{6}-{7}.",
+                                                          r1, r2, Math.Round(currentDistance, 2), Math.Round(newRoute1.Distance + newRoute2.Distance, 2),
+                                                          r1, i, r2, j);
 
                                         _solution.Routes[r1] = newRoute1;
                                         _solution.Routes[r2] = newRoute2;
                                         improved = true;
                                     }
-                                    else
-                                    {
-                                        Console.Write("Feasible, but no improvement!");
-                                    }
-                                } 
-                                else
-                                {
-                                    Console.Write("Not feasible to swap!");
                                 }
-                                Console.WriteLine();
                             }
                         }
                     }
@@ -83,7 +68,7 @@ namespace VRPTW.Heuristics
 
         private Route ApplyOperator(Route route, Customer current, Customer candidate)
         {
-            var currentInRoute = route.Customers.Where(c => c.Name == current.Name).FirstOrDefault();
+            var currentInRoute = route.Customers.Where(c => c.Id == current.Id).FirstOrDefault();
             var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
 
             route.Customers.Remove(currentInRoute);

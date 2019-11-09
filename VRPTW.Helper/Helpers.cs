@@ -48,8 +48,8 @@ namespace VRPTW.Helper
             {
                 for (int c = 0; c < solution.Routes[r].Customers.Count - 1; c++)
                 {
-                    int start = solution.Routes[r].Customers[c].Name;
-                    int end = solution.Routes[r].Customers[c + 1].Name;
+                    int start = solution.Routes[r].Customers[c].Id;
+                    int end = solution.Routes[r].Customers[c + 1].Id;
                     vehicleTraverse[r, start, end] = 1.0;
                 }
             }

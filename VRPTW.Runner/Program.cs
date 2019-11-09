@@ -33,7 +33,11 @@ namespace VRPTW.Runner
                     break;
             }
 
-            using (StreamWriter file = File.CreateText(""))
+            solution = new GSolver(dataset, solution).Run();
+
+            var outputPathString = Config.GetFileOperation().OutputPath + Config.GetFileOperation().OutputName;
+
+            using (StreamWriter file = File.CreateText(outputPathString))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, solution);

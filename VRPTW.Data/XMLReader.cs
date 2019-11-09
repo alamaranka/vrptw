@@ -13,14 +13,14 @@ namespace VRPTW.Data
 
         public XMLReader()
         {
-            _doc = XDocument.Load(Config.GetFileOperation().FilePath +
-                                  Config.GetFileOperation().FileName);
+            _doc = XDocument.Load(Config.GetFileOperation().InstancePath +
+                                  Config.GetFileOperation().InstanceName);
         }
 
         public List<Customer> GetVertices()
         {
             var vertices = new List<Customer>();
-            var name = _doc.Descendants("node").Select(c => c.Attribute("id").Value).ToList();
+            var id = _doc.Descendants("node").Select(c => c.Attribute("id").Value).ToList();
             var latitude = _doc.Descendants("cx").Select(x => x.Value).ToList();
             var longitude = _doc.Descendants("cy").Select(c => c.Value).ToList();
             var demand = _doc.Descendants("quantity").Select(c => c.Value).ToList();
@@ -33,11 +33,11 @@ namespace VRPTW.Data
             timeEnd.Insert(0, _doc.Descendants("max_travel_time").Select(c => c.Value).ToList()[0]);
             serviceTime.Insert(0, "0");
 
-            for (var record = 0; record < name.Count; record++)
+            for (var record = 0; record < id.Count; record++)
             {
                 var customer = new Customer
                 {
-                    Name = (int)Convert.ToDouble(name[record]),
+                    Id = (int)Convert.ToDouble(id[record]),
                     Latitude = (int)Convert.ToDouble(latitude[record]),
                     Longitude = (int)Convert.ToDouble(longitude[record]),
                     Demand = (int)Convert.ToDouble(demand[record]),

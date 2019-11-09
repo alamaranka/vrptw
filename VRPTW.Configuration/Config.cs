@@ -28,8 +28,10 @@ namespace VRPTW.Configuration
         {
             return new FileOperation()
             {
-                FilePath = ConfigManager.AppSetting["FileOperation:FilePath"],
-                FileName = ConfigManager.AppSetting["FileOperation:FileName"]
+                InstancePath = ConfigManager.AppSetting["FileOperation:InstancePath"],
+                InstanceName = ConfigManager.AppSetting["FileOperation:InstanceName"],
+                OutputPath = ConfigManager.AppSetting["FileOperation:OutputPath"],
+                OutputName = ConfigManager.AppSetting["FileOperation:OutputName"]
             };
         }
 
