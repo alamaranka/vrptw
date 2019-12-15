@@ -2,14 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Google.OrTools" Version="7.3.7083" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VRPTW.Configuration\VRPTW.Configuration.csproj" />
@@ -20,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="gurobi81.netstandard20">
-      <HintPath>..\..\..\..\..\..\gurobi811\win64\lib\gurobi81.netstandard20.dll</HintPath>
+    <Reference Include="gurobi90.netstandard20">
+      <HintPath>..\..\..\..\..\Library\gurobi900\mac64\lib\gurobi90.netstandard20.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.IO;
 using VRPTW.Algorithm;
 using VRPTW.Algorithm.Benders;
@@ -33,15 +32,12 @@ namespace VRPTW.Runner
                     break;
             }
 
-            solution = new GSolver(dataset, solution).Run();
+            var outputPathString = Config.GetFileOperation().OutputPath +
+                                   Config.GetFileOperation().OutputName;
 
-            var outputPathString = Config.GetFileOperation().OutputPath + Config.GetFileOperation().OutputName;
-
-            using (StreamWriter file = File.CreateText(outputPathString))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, solution);
-            }
+            using StreamWriter file = File.CreateText(outputPathString);
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Serialize(file, solution);
         }
     }
 }
