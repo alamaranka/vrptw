@@ -49,7 +49,8 @@ namespace VRPTW.Heuristics
                         var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers
                                                                 .IndexOf(insertionValueOfFeasibleCustomers.Max());
                         var bestCustomerToInsert = feasibleCustomersToInsert[indexOfBestFeasibleCustomer];
-                        InsertCustomerToTheRoute(previous, bestCustomerToInsert, next);
+                        InsertCustomerToTheRoute(bestCustomerToInsert, next);
+                        _candidateCustomers.Remove(bestCustomerToInsert);
                         anyFeasibleCustomer = true;
                     }
                 }
@@ -67,46 +68,37 @@ namespace VRPTW.Heuristics
             {
                 Customers = new List<Customer>() { _depot, Helpers.Clone(_depot) },
                 Load = 0.0,
-                Distance = 0.0
+                Distance = 0.0,
+                Capacity = _routeCapacity
             };
-            InsertCustomerToTheRoute(_route.Customers[0], GetSeedCustomer(), _route.Customers[1]);
+            InsertCustomerToTheRoute(GetSeedCustomer(), _route.Customers[1]);
         }
 
-        private void InsertCustomerToTheRoute(Customer previous, Customer candidate, Customer next)
+        private void InsertCustomerToTheRoute(Customer candidate, Customer next)
         {
-            _route.Customers.Insert(_route.Customers.IndexOf(next), candidate);
-            for (var p = _route.Customers.IndexOf(candidate); p < _route.Customers.Count; p++)
-            {
-                _route.Customers[p].ServiceStart = Helpers.CalculateServiceStart(_route.Customers[p - 1], _route.Customers[p]);
-            }
-            _route.Load += candidate.Demand;
-            _route.Distance = _route.Distance -
-                              Helpers.CalculateDistance(previous, next) +
-                              Helpers.CalculateDistance(previous, candidate) +
-                              Helpers.CalculateDistance(candidate, next);
-            _candidateCustomers.Remove(candidate);
+            var cloneRoute = Helpers.Clone(_route);
+            var customersInNewOrder = cloneRoute.Customers;
+            customersInNewOrder.Insert(_route.Customers.IndexOf(next), candidate);
+            _route = Helpers.ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
         }
 
         private bool IsFeasibleToInsert(Customer candidate, Customer next)
         {
-            if (_route.Load + candidate.Demand > _routeCapacity)
+            if (_route.Load + candidate.Demand > _route.Capacity)
             {
                 return false;
             }
 
-            var candidateRoute = Helpers.Clone(_route);
-            candidateRoute.Customers.Insert(_route.Customers.IndexOf(next), candidate);
+            var cloneRoute = Helpers.Clone(_route);
+            var customersInNewOrder = cloneRoute.Customers;
+            customersInNewOrder.Insert(_route.Customers.IndexOf(next), candidate);
+            var constructedRoute = Helpers.ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
 
-            for (var p = candidateRoute.Customers.IndexOf(candidate); p < candidateRoute.Customers.Count; p++)
+            if (constructedRoute == null)
             {
-                var newServiceStartTime = Helpers.CalculateServiceStart(candidateRoute.Customers[p - 1], candidateRoute.Customers[p]);
-                var isAfterTimeEnd = newServiceStartTime > candidateRoute.Customers[p].TimeEnd;
-                candidateRoute.Customers[p].ServiceStart = newServiceStartTime;
-                if (isAfterTimeEnd)
-                {
-                    return false;
-                }
+                return false;
             }
+
             return true;
         }
 

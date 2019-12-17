@@ -68,22 +68,14 @@ namespace VRPTW.Heuristics
 
         private Route ApplyOperator(Route route, Customer current, Customer candidate)
         {
+            var customersInNewOrder = route.Customers;
             var currentInRoute = route.Customers.Where(c => c.Id == current.Id).FirstOrDefault();
             var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
 
-            route.Customers.Remove(currentInRoute);
-            route.Customers.Insert(indexOfCurrent, candidate);
+            customersInNewOrder.Remove(currentInRoute);
+            customersInNewOrder.Insert(indexOfCurrent, candidate);
 
-            var constructedRoute = Helpers.ConstructRoute(route);
-            var isFeasible = constructedRoute.Item1;
-            var newRoute = constructedRoute.Item2;
-
-            if (isFeasible)
-            {
-                return newRoute;
-            }
-
-            return newRoute;
+            return Helpers.ConstructRoute(customersInNewOrder, route.Capacity);
         }
     }
 }

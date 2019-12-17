@@ -64,33 +64,36 @@ namespace VRPTW.Helper
                    Helpers.CalculateDistance(previous, next));
         }
 
-        public static (bool, Route) ConstructRoute(Route route)
+        public static Route ConstructRoute(List<Customer> customers, double capacity)
         {
-            var load = 0.0;
-            var distance = 0.0;
-
-            for (var c = 1; c < route.Customers.Count; c++)
+            var route = new Route()
             {
-                route.Customers[c].ServiceStart = Helpers.CalculateServiceStart(route.Customers[c - 1], route.Customers[c]);
-                load += route.Customers[c].Demand;
-                distance += Helpers.CalculateDistance(route.Customers[c - 1], route.Customers[c]);
+                Customers = new List<Customer>{ customers[0] },
+                Load = 0.0,
+                Distance = 0.0,
+                Capacity = capacity
+            };
 
-                if (!IsFeasible(route, load, c))
+            for (var c = 1; c < customers.Count; c++)
+            {
+                route.Customers.Add(customers[c]);
+                route.Customers[c].ServiceStart = CalculateServiceStart(route.Customers[c - 1], route.Customers[c]);
+                route.Load += route.Customers[c].Demand;
+                route.Distance += CalculateDistance(route.Customers[c - 1], route.Customers[c]);
+
+                if (!IsFeasible(customers[c], route.Load, route.Capacity))
                 {
-                    return (false, null);
+                    return null;
                 }
             }
 
-            route.Load = load;
-            route.Distance = distance;
-
-            return (true, route);
+            return route;
         }
 
-        public static bool IsFeasible(Route route, double load, int c)
+        public static bool IsFeasible(Customer customer, double load, double capacity)
         {
-            var isCapacityExceeded = load > route.Capacity;
-            var isAfterTimeEnd = route.Customers[c].ServiceStart > route.Customers[c].TimeEnd;
+            var isCapacityExceeded = load > capacity;
+            var isAfterTimeEnd = customer.ServiceStart > customer.TimeEnd;
 
             if (isCapacityExceeded || isAfterTimeEnd)
             {
