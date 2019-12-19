@@ -8,6 +8,7 @@ namespace VRPTW.Configuration
         {
             return ConfigManager.AppSetting["SolverType"];
         }
+
         public static string GetDataSource()
         {
             return ConfigManager.AppSetting["DataSource"];
@@ -24,6 +25,7 @@ namespace VRPTW.Configuration
                 Password = ConfigManager.AppSetting["ConnectionString:Password"]
             };
         }
+
         public static FileOperation GetFileOperation()
         {
             return new FileOperation()
@@ -62,6 +64,16 @@ namespace VRPTW.Configuration
                 Mu = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:InitialSolutionParam:Mu"]),
                 Lambda = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:InitialSolutionParam:Lambda"])
             };
+        }
+
+        public static SimulatedAnnealingParam GetSimulatedAnnealingParam()
+        {
+            return new SimulatedAnnealingParam()
+            {
+                InitialTemperature = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnedalingParam:InitialTemperature"]),
+                Alpha = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnedalingParam:Alpha"]),
+                IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnedalingParam:IterationCount"])
+            };            
         }
     }
 }
