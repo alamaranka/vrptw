@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <Reference Include="gurobi90.netstandard20">
-      <HintPath>..\..\..\..\..\Library\gurobi900\mac64\lib\gurobi90.netstandard20.dll</HintPath>
+      <HintPath>..\VRPTW.SampleProblem\gurobi90.netstandard20.dll</HintPath>
     </Reference>
   </ItemGroup>
 
