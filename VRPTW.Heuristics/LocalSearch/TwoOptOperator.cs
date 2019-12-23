@@ -14,10 +14,9 @@ namespace VRPTW.Heuristics
         public TwoOptOperator(Solution solution)
         {
             _solution = solution;
-            Apply2OptOperator();
         }
 
-        private void Apply2OptOperator()
+        public void Apply2OptOperator()
         {
             var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
@@ -53,6 +52,33 @@ namespace VRPTW.Heuristics
                 }
             }
             _solution.Cost = _solution.Routes.Sum(r => r.Distance);
+        }
+
+        public List<Solution> GenerateFeasibleSolutions()
+        {
+            var solutionPool = new List<Solution>();
+            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+
+            for (var r = 0; r < numberOfActualRoutes; r++)
+            {
+                for (var i = 1; i < _solution.Routes[r].Customers.Count - 2; i++)
+                {
+                    for (var j = i + 1; j < _solution.Routes[r].Customers.Count - 1; j++)
+                    {
+                        var solution = Helpers.Clone(_solution);
+                        var newRoute = ApplyOperator(Helpers.Clone(solution.Routes[r]), i, j);
+
+                        if (newRoute != null)
+                        {
+                            solution.Routes[r] = newRoute;
+                            solution.Cost = solution.Routes.Sum(r => r.Distance);
+                            solutionPool.Add(solution);
+                        }
+                    }
+                }              
+            }
+
+            return solutionPool;
         }
 
         private Route ApplyOperator(Route route, int i, int j)

@@ -70,9 +70,9 @@ namespace VRPTW.Configuration
         {
             return new SimulatedAnnealingParam()
             {
-                InitialTemperature = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnedalingParam:InitialTemperature"]),
-                Alpha = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnedalingParam:Alpha"]),
-                IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnedalingParam:IterationCount"])
+                InitialTemperature = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:InitialTemperature"]),
+                Alpha = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:Alpha"]),
+                IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:IterationCount"])
             };            
         }
     }

@@ -20,8 +20,8 @@ namespace VRPTW.Heuristics
             {
                 improved = false;
                 var cost = solution.Cost;
-                new TwoOptOperator(solution);
-                new ExchangeOperator(solution);
+                new TwoOptOperator(solution).Apply2OptOperator();
+                new ExchangeOperator(solution).ApplySwapOperator();
 
                 if (solution.Cost < cost)
                 {

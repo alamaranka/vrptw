@@ -12,4 +12,8 @@
     <ProjectReference Include="..\VRPTW.Helper\VRPTW.Helper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="LocalSearch\" />
+    <Folder Include="InitialSolution\" />
+  </ItemGroup>
 </Project>

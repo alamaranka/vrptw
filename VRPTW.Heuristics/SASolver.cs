@@ -18,7 +18,7 @@ namespace VRPTW.Heuristics
 
         public Solution Run()
         {
-            var currentSolution = new InitialSolution(_dataset).Get();
+            var currentSolution = new HSolver(_dataset).Run();
             var temperature = Config.GetSimulatedAnnealingParam().InitialTemperature;
             var alpha = Config.GetSimulatedAnnealingParam().Alpha;
             var iterationCount = Config.GetSimulatedAnnealingParam().IterationCount;
@@ -26,7 +26,10 @@ namespace VRPTW.Heuristics
             for (var i=0; i<iterationCount; i++)
             {
                 var solutionPool = new List<Solution>();
-                //TODO: collect solutions from local search operators
+                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
+                solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
+                Console.WriteLine("Iteration: {0}, Temperature: {1}, {2} candidate solutions, current cost: {3}",
+                                   i + 1, temperature, solutionPool.Count, currentSolution.Cost);
 
                 foreach (var candidateSolution in solutionPool)
                 {
@@ -46,7 +49,7 @@ namespace VRPTW.Heuristics
                 temperature *= alpha;
             }
 
-            return null;
+            return currentSolution;
         }
 
         private double GetThreshold(double currentObj, double candidateObj, double currentTemperature)
