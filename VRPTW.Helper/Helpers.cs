@@ -102,5 +102,12 @@ namespace VRPTW.Helper
 
             return true;
         }
+
+        public static Solution GetRandomNeighbor(List<Solution> solutionPool)
+        {
+            var rand = new Random();
+            var rIndex = rand.Next(solutionPool.Count);
+            return solutionPool[rIndex];
+        }
     }
 }
