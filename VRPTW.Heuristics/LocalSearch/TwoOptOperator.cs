@@ -18,9 +18,11 @@ namespace VRPTW.Heuristics
 
         public void Apply2OptOperator()
         {
-            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            Console.WriteLine("Applying 2-Opt Operator. Initial cost: {0}", 
+                              _solution.Routes.Sum(r => r.Distance));
 
-            Console.WriteLine("Applying 2-Opt Operator" + new string('.', 10));
+            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var iterationCount = 0;
 
             for (var r = 0; r < numberOfActualRoutes; r++)
             {
@@ -40,13 +42,15 @@ namespace VRPTW.Heuristics
                             if (newRoute != null)
                             {
                                 if (newRoute.Distance < currentDistance)
-                                {
-                                    Console.WriteLine("Distance of Route{0} reduced from {1} to {2} as a result of {3}<->{4}.", 
-                                                      r, Math.Round(currentDistance, 2), Math.Round(newRoute.Distance, 2), i, j);
+                                {                                  
                                     _solution.Routes[r] = newRoute;
                                     improved = true;
+                                    Console.WriteLine("Iteration number: {0}. Improved cost: {1}", 
+                                                      iterationCount, _solution.Routes.Sum(r => r.Distance));
                                 }
                             }
+
+                            iterationCount++;
                         }
                     }
                 }

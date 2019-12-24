@@ -21,9 +21,11 @@ namespace VRPTW.Heuristics
 
         public void ApplySwapOperator()
         {
-            var improved = true;
+            Console.WriteLine("Applying Exchange Operator. Initial cost: {0}", 
+                              _solution.Routes.Sum(r => r.Distance));
 
-            Console.WriteLine("Applying Exchange Operator" + new string('.', 10));
+            var improved = true;
+            var iterationCount = 0;
 
             while (improved)
             {
@@ -51,15 +53,16 @@ namespace VRPTW.Heuristics
                                 {
                                     if (newRoute1.Distance + newRoute2.Distance < currentDistance)
                                     {
-                                        Console.WriteLine("Total distance of Routes {0} and {1} reduced from {2} to {3} as a result of {4}-{5}<->{6}-{7}.",
-                                                          r1, r2, Math.Round(currentDistance, 2), Math.Round(newRoute1.Distance + newRoute2.Distance, 2),
-                                                          r1, i, r2, j);
-
                                         _solution.Routes[r1] = newRoute1;
                                         _solution.Routes[r2] = newRoute2;
                                         improved = true;
+
+                                        Console.WriteLine("Iteration number: {0}. Improved cost: {1}", 
+                                                          iterationCount, _solution.Routes.Sum(r => r.Distance));
                                     }
                                 }
+
+                                iterationCount++;
                             }
                         }
                     }
