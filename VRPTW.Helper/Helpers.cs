@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using VRPTW.Model;
 
@@ -103,11 +104,16 @@ namespace VRPTW.Helper
             return true;
         }
 
-        public static Solution GetRandomNeighbor(List<Solution> solutionPool)
+        public static Solution GetRandomNeighbour(List<Solution> solutionPool)
         {
             var rand = new Random();
             var rIndex = rand.Next(solutionPool.Count);
             return solutionPool[rIndex];
+        }
+
+        public static Solution GetBestNeighbour(List<Solution> solutionPool)
+        {
+            return solutionPool.OrderByDescending(s => -s.Cost).First();
         }
     }
 }

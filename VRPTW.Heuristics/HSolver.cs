@@ -1,4 +1,5 @@
-﻿using VRPTW.Model;
+﻿using VRPTW.Heuristics.LocalSearch;
+using VRPTW.Model;
 
 namespace VRPTW.Heuristics
 {
@@ -22,6 +23,8 @@ namespace VRPTW.Heuristics
                 var cost = solution.Cost;
                 new TwoOptOperator(solution).Apply2OptOperator();
                 new ExchangeOperator(solution).ApplySwapOperator();
+                new RelocateOperator(solution).ApplyRelocateOperator();
+                new Diversifier(solution, 3, 7).Diverisfy();
 
                 if (solution.Cost < cost)
                 {

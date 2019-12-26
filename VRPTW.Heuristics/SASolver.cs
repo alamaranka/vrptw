@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VRPTW.Configuration;
 using VRPTW.Helper;
+using VRPTW.Heuristics.LocalSearch;
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
@@ -26,24 +27,27 @@ namespace VRPTW.Heuristics
             for (var i=0; i<iterationCount; i++)
             {
                 var solutionPool = new List<Solution>();
-                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
+                solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions()); 
+                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
+
+                //var candidateSolution = Helpers.GetRandomNeighbour(solutionPool);
+                //var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
+                var candidateSolution = new Solution();
+
                 Console.WriteLine("Iteration: {0}, Temperature: {1}, {2} candidate solutions, current cost: {3}",
                                    i + 1, temperature, solutionPool.Count, currentSolution.Cost);
 
-                foreach (var candidateSolution in solutionPool)
-                {
-                    var currentCost = currentSolution.Cost;
-                    var candidateCost = candidateSolution.Cost;
-                    var rand = new Random().NextDouble();
-                    var threshold = GetThreshold(currentCost, candidateCost, temperature);
-                    var acceptanceCondition = candidateCost < currentCost ||
-                                              (candidateCost >= currentCost && rand <= threshold);
+                var currentCost = currentSolution.Cost;
+                var candidateCost = candidateSolution.Cost;
+                var rand = new Random().NextDouble();
+                var threshold = GetThreshold(currentCost, candidateCost, temperature);
+                var acceptanceCondition = candidateCost < currentCost ||
+                                            (candidateCost >= currentCost && rand <= threshold);
 
-                    if (acceptanceCondition)
-                    {
-                        currentSolution = Helpers.Clone(candidateSolution);
-                    }
+                if (acceptanceCondition)
+                {
+                    currentSolution = Helpers.Clone(candidateSolution);
                 }
 
                 temperature *= alpha;
