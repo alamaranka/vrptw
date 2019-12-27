@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VRPTW.Configuration;
+using VRPTW.Helper;
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
@@ -44,6 +46,51 @@ namespace VRPTW.Heuristics
                     i--;
                 }
             }
+
+            _solution = ReInsertRemovedCustomers(removedCustomers);
+        }
+
+        private Solution ReInsertRemovedCustomers(List<Customer> customers)
+        {
+            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var solution = Helpers.Clone(_solution);
+
+            while (customers.Count > 0)
+            {
+                for (var r = 0; r < numberOfActualRoutes; r++)
+                {
+                    var route = Helpers.Clone(solution.Routes[r]);
+
+                    for (var p = 1; p < route.Customers.Count; p++)
+                    {
+                        var previous = route.Customers[p - 1];
+                        var next = route.Customers[p];
+                        var feasibleCustomersToInsert = new List<Customer>();
+                        var insertionValueOfFeasibleCustomers = new List<double>();
+                        foreach (var candidate in customers)
+                        {
+                            if (Helpers.IsFeasibleToInsert(route, candidate, next))
+                            {
+                                feasibleCustomersToInsert.Add(candidate);
+                                insertionValueOfFeasibleCustomers
+                                    .Add(Helpers.InsertionValueOfCustomer(previous, candidate, next, route.Customers[0]));
+                            }
+                        }
+                        if (feasibleCustomersToInsert.Count > 0)
+                        {
+                            var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers
+                                                                    .IndexOf(insertionValueOfFeasibleCustomers.Max());
+                            var bestCustomerToInsert = feasibleCustomersToInsert[indexOfBestFeasibleCustomer];
+                            route = Helpers.InsertCustomerToTheRoute(route, bestCustomerToInsert, next);
+                            customers.Remove(bestCustomerToInsert);
+                        }
+                    }
+
+                    solution.Routes[r] = route;
+                }
+            }
+
+            return solution;
         }
     }
 }

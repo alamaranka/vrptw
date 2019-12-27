@@ -37,11 +37,11 @@ namespace VRPTW.Heuristics
                     var insertionValueOfFeasibleCustomers = new List<double>();
                     foreach (var candidate in _candidateCustomers)
                     {
-                        if (IsFeasibleToInsert(candidate, next))
+                        if (Helpers.IsFeasibleToInsert(_route, candidate, next))
                         {
                             feasibleCustomersToInsert.Add(candidate);
                             insertionValueOfFeasibleCustomers
-                                .Add(InsertionValueOfCustomer(previous, candidate, next));
+                                .Add(Helpers.InsertionValueOfCustomer(previous, candidate, next, _depot));
                         }
                     }
                     if (feasibleCustomersToInsert.Count > 0)
@@ -49,7 +49,7 @@ namespace VRPTW.Heuristics
                         var indexOfBestFeasibleCustomer = insertionValueOfFeasibleCustomers
                                                                 .IndexOf(insertionValueOfFeasibleCustomers.Max());
                         var bestCustomerToInsert = feasibleCustomersToInsert[indexOfBestFeasibleCustomer];
-                        InsertCustomerToTheRoute(bestCustomerToInsert, next);
+                        _route = Helpers.InsertCustomerToTheRoute(_route, bestCustomerToInsert, next);
                         _candidateCustomers.Remove(bestCustomerToInsert);
                         anyFeasibleCustomer = true;
                     }
@@ -71,57 +71,7 @@ namespace VRPTW.Heuristics
                 Distance = 0.0,
                 Capacity = _routeCapacity
             };
-            InsertCustomerToTheRoute(GetSeedCustomer(), _route.Customers[1]);
-        }
-
-        private void InsertCustomerToTheRoute(Customer candidate, Customer next)
-        {
-            var cloneRoute = Helpers.Clone(_route);
-            var customersInNewOrder = cloneRoute.Customers;
-            customersInNewOrder.Insert(_route.Customers.IndexOf(next), candidate);
-            _route = Helpers.ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
-        }
-
-        private bool IsFeasibleToInsert(Customer candidate, Customer next)
-        {
-            if (_route.Load + candidate.Demand > _route.Capacity)
-            {
-                return false;
-            }
-
-            var cloneRoute = Helpers.Clone(_route);
-            var customersInNewOrder = cloneRoute.Customers;
-            customersInNewOrder.Insert(_route.Customers.IndexOf(next), candidate);
-            var constructedRoute = Helpers.ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
-
-            if (constructedRoute == null)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private double InsertionValueOfCustomer(Customer previous, Customer candidate, Customer next)
-        {
-            var alpha1 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha1;
-            var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
-            var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
-            var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
-            var c11 = Helpers.CalculateDistance(previous, candidate) +
-                      Helpers.CalculateDistance(candidate, next) -
-                      Helpers.CalculateDistance(previous, next) * mu;
-            var candidateStartTime = Math.Max(previous.ServiceStart +
-                                     previous.ServiceTime +
-                                     Helpers.CalculateDistance(previous, candidate),
-                                     candidate.TimeStart);
-            var c12 = Math.Max(candidateStartTime +
-                      candidate.ServiceTime +
-                      Helpers.CalculateDistance(candidate, next),
-                      candidate.TimeStart) -
-                      next.ServiceStart;
-            var c1 = alpha1 * c11 + alpha2 * c12;
-            return lambda * Helpers.CalculateDistance(_depot, candidate) - c1;
+            _route = Helpers.InsertCustomerToTheRoute(_route, GetSeedCustomer(), _route.Customers[1]);
         }
 
         private Customer GetSeedCustomer()
