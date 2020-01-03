@@ -19,18 +19,19 @@ namespace VRPTW.Heuristics
             _solution = solution;
         }
 
-        public void ApplySwapOperator()
+        public Solution ApplySwapOperator()
         {
             Console.WriteLine("Applying Exchange Operator. Initial cost: {0}", 
                               _solution.Routes.Sum(r => r.Distance));
 
             var improved = true;
             var iterationCount = 0;
+            var numberOfActualRoutes = 0;
 
             while (improved)
             {
                 improved = false;
-                var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+                numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
                 for (var r1 = 0; r1 < numberOfActualRoutes - 1; r1++)
                 {
@@ -56,6 +57,7 @@ namespace VRPTW.Heuristics
                                         _solution.Routes[r1] = newRoute1;
                                         _solution.Routes[r2] = newRoute2;
                                         improved = true;
+                                        numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
                                         Console.WriteLine("Iteration number: {0}. Improved cost: {1}", 
                                                           iterationCount, _solution.Routes.Sum(r => r.Distance));
@@ -69,6 +71,7 @@ namespace VRPTW.Heuristics
                 }
             }
             _solution.Cost = _solution.Routes.Sum(r => r.Distance);
+            return _solution;
         }
 
         public List<Solution> GenerateFeasibleSolutions()

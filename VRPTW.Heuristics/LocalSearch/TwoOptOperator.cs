@@ -16,7 +16,7 @@ namespace VRPTW.Heuristics
             _solution = solution;
         }
 
-        public void Apply2OptOperator()
+        public Solution Apply2OptOperator()
         {
             Console.WriteLine("Applying 2-Opt Operator. Initial cost: {0}", 
                               _solution.Routes.Sum(r => r.Distance));
@@ -56,6 +56,7 @@ namespace VRPTW.Heuristics
                 }
             }
             _solution.Cost = _solution.Routes.Sum(r => r.Distance);
+            return _solution;
         }
 
         public List<Solution> GenerateFeasibleSolutions()

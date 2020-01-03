@@ -29,11 +29,8 @@ namespace VRPTW.Heuristics
                 var solutionPool = new List<Solution>();
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions()); 
-                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
-
-                //var candidateSolution = Helpers.GetRandomNeighbour(solutionPool);
-                //var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
-                var candidateSolution = new Solution();
+                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());               
+                var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
 
                 Console.WriteLine("Iteration: {0}, Temperature: {1}, {2} candidate solutions, current cost: {3}",
                                    i + 1, temperature, solutionPool.Count, currentSolution.Cost);
@@ -48,6 +45,11 @@ namespace VRPTW.Heuristics
                 if (acceptanceCondition)
                 {
                     currentSolution = Helpers.Clone(candidateSolution);
+                }
+
+                if (i % 20 == 0)
+                {
+                    currentSolution = new Diversifier(currentSolution, 5, 10).Diverisfy();
                 }
 
                 temperature *= alpha;

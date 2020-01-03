@@ -16,7 +16,7 @@ namespace VRPTW.Heuristics.LocalSearch
             _solution = solution;
         }
 
-        public void ApplyRelocateOperator()
+        public Solution ApplyRelocateOperator()
         {
             Console.WriteLine("Applying Relocate Operator. Initial cost: {0}",
                               _solution.Routes.Sum(r => r.Distance));
@@ -33,10 +33,14 @@ namespace VRPTW.Heuristics.LocalSearch
                 {
                     for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
                     {
-                        for (var i = 1; i < _solution.Routes[r1].Customers.Count - 1; i++)
+                        for (var i = 1; i < 999; i++)
                         {
-                            for (var j = 1; j < _solution.Routes[r2].Customers.Count - 1; j++)
+                            if (_solution.Routes[r1].Customers.Count - 1 == i)
+                                break;
+                            for (var j = 1; j < 999; j++)
                             {
+                                if (_solution.Routes[r2].Customers.Count - 1 == j)
+                                    break;
                                 var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
                                 var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
                                 var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
@@ -53,9 +57,11 @@ namespace VRPTW.Heuristics.LocalSearch
                                         _solution.Routes[r1] = newRoute1;
                                         _solution.Routes[r2] = newRoute2;
                                         improved = true;
-
+                                        j = 1;
+                                        i = 1;
                                         Console.WriteLine("Iteration number: {0}. Improved cost: {1}",
                                                           iterationCount, _solution.Routes.Sum(r => r.Distance));
+                                        break;
                                     }
                                 }
 
@@ -66,6 +72,7 @@ namespace VRPTW.Heuristics.LocalSearch
                 }
             }
             _solution.Cost = _solution.Routes.Sum(r => r.Distance);
+            return _solution;
         }
 
         public List<Solution> GenerateFeasibleSolutions()
@@ -96,7 +103,7 @@ namespace VRPTW.Heuristics.LocalSearch
                                 solution.Cost = solution.Routes.Sum(r => r.Distance);
                                 solutionPool.Add(solution);
                             }
-                        }                        
+                        }
                     }
                 }
             }

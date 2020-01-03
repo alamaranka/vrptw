@@ -11,8 +11,8 @@ namespace VRPTW.Heuristics
     public class Diversifier
     {
         private Solution _solution;
-        private int _dMin;
-        private int _dMax;
+        private readonly int _dMin;
+        private readonly int _dMax;
 
         public Diversifier(Solution solution, int dMin, int dMax)
         {
@@ -21,7 +21,7 @@ namespace VRPTW.Heuristics
             _dMax = dMax;
         }
 
-        public void Diverisfy()
+        public Solution Diverisfy()
         {
             var allCustomers = _solution.Routes
                 .SelectMany(c => c.Customers)
@@ -38,16 +38,18 @@ namespace VRPTW.Heuristics
 
                 if (!removedCustomers.Contains(allCustomers[randIndex]))
                 {
-                    allCustomers.Remove(allCustomers[randIndex]);
-                    removedCustomers.Add(allCustomers[randIndex]);
+                    var removedCustomer = allCustomers[randIndex];
+                    allCustomers.Remove(removedCustomer);
+                    removedCustomers.Add(removedCustomer);
+                    _solution.Routes.Where(r => r.Customers.Contains(removedCustomer)).ToList()
+                        .FirstOrDefault().Customers.Remove(removedCustomer);
                 }
                 else
                 {
                     i--;
                 }
             }
-
-            _solution = ReInsertRemovedCustomers(removedCustomers);
+            return ReInsertRemovedCustomers(removedCustomers);
         }
 
         private Solution ReInsertRemovedCustomers(List<Customer> customers)
@@ -87,9 +89,9 @@ namespace VRPTW.Heuristics
                     }
 
                     solution.Routes[r] = route;
+                    solution.Cost = solution.Routes.Sum(r => r.Distance);
                 }
             }
-
             return solution;
         }
     }
