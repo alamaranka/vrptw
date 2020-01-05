@@ -19,7 +19,7 @@ namespace VRPTW.Heuristics
             _solution = solution;
         }
 
-        public Solution ApplySwapOperator()
+        public Solution ApplyExchangeOperator()
         {
             Console.WriteLine("Applying Exchange Operator. Initial cost: {0}", 
                               _solution.Routes.Sum(r => r.Distance));

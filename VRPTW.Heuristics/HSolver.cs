@@ -22,9 +22,8 @@ namespace VRPTW.Heuristics
                 improved = false;
                 var cost = solution.Cost;
                 solution = new TwoOptOperator(solution).Apply2OptOperator();
-                solution = new ExchangeOperator(solution).ApplySwapOperator();
+                solution = new ExchangeOperator(solution).ApplyExchangeOperator();
                 solution = new RelocateOperator(solution).ApplyRelocateOperator();
-                //solution = new Diversifier(solution, 8, 15).Diverisfy();
 
                 if (solution.Cost < cost)
                 {

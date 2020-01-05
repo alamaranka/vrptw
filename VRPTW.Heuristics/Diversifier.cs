@@ -29,6 +29,7 @@ namespace VRPTW.Heuristics
                 .GroupBy(i => i.Id)
                 .Select(g => g.FirstOrDefault())
                 .ToList();
+
             var numberOfCustomersToRemove = new Random().Next(_dMin, _dMax);
             var removedCustomers = new List<Customer>();
 

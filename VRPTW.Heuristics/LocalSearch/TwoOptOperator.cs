@@ -59,28 +59,37 @@ namespace VRPTW.Heuristics
             return _solution;
         }
 
-        public List<Solution> GenerateFeasibleSolutions()
+        public List<Solution> GenerateFeasibleSolutions(int numberOfSolutions)
         {
             var solutionPool = new List<Solution>();
             var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
-            for (var r = 0; r < numberOfActualRoutes; r++)
+            while (solutionPool.Count < numberOfSolutions)
             {
-                for (var i = 1; i < _solution.Routes[r].Customers.Count - 2; i++)
-                {
-                    for (var j = i + 1; j < _solution.Routes[r].Customers.Count - 1; j++)
-                    {
-                        var solution = Helpers.Clone(_solution);
-                        var newRoute = ApplyOperator(Helpers.Clone(solution.Routes[r]), i, j);
+                var rand = new Random();
+                var randRoute = rand.Next(numberOfActualRoutes);
 
-                        if (newRoute != null)
-                        {
-                            solution.Routes[r] = newRoute;
-                            solution.Cost = solution.Routes.Sum(r => r.Distance);
-                            solutionPool.Add(solution);
-                        }
+                if (_solution.Routes[randRoute].Customers.Count - 3 < 1)
+                {
+                    continue;
+                }
+
+                var randCustomer1 = rand.Next(1, _solution.Routes[randRoute].Customers.Count - 3);
+                var randCustomer2 = rand.Next(randCustomer1 + 1, _solution.Routes[randRoute].Customers.Count - 2);
+
+                var solution = Helpers.Clone(_solution);
+                var newRoute = ApplyOperator(Helpers.Clone(solution.Routes[randRoute]), randCustomer1, randCustomer2);
+                
+                if (newRoute != null)
+                {
+                    solution.Routes[randRoute] = newRoute;
+                    solution.Cost = solution.Routes.Sum(r => r.Distance);
+                    
+                    if (!solutionPool.Contains(solution))
+                    {
+                        solutionPool.Add(solution);
                     }
-                }              
+                }
             }
 
             return solutionPool;

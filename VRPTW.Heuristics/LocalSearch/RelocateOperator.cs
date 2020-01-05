@@ -10,6 +10,8 @@ namespace VRPTW.Heuristics.LocalSearch
     class RelocateOperator
     {
         public Solution _solution;
+        private bool _improved = true;
+        private int _iterationCount = 0;
 
         public RelocateOperator(Solution solution)
         {
@@ -21,58 +23,54 @@ namespace VRPTW.Heuristics.LocalSearch
             Console.WriteLine("Applying Relocate Operator. Initial cost: {0}",
                               _solution.Routes.Sum(r => r.Distance));
 
-            var improved = true;
-            var iterationCount = 0;
 
-            while (improved)
+            while (_improved)
             {
-                improved = false;
-                var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+                _improved = false;
+                Iterate();
+            }
+            _solution.Cost = _solution.Routes.Sum(r => r.Distance);
+            return _solution;
+        }
 
-                for (var r1 = 0; r1 < numberOfActualRoutes - 1; r1++)
+        private void Iterate()
+        {
+            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+
+            for (var r1 = 0; r1 < numberOfActualRoutes - 1; r1++)
+            {
+                for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
                 {
-                    for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
+                    for (var i = 1; i < _solution.Routes[r1].Customers.Count - 1; i++)
                     {
-                        for (var i = 1; i < 999; i++)
+                        for (var j = 1; j < _solution.Routes[r2].Customers.Count - 1; j++)
                         {
-                            if (_solution.Routes[r1].Customers.Count - 1 == i)
-                                break;
-                            for (var j = 1; j < 999; j++)
+                            var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
+                            var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
+                            var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
+                            var customerInRoute1 = cloneOfRoute1.Customers[i];
+                            var customerInRoute2 = cloneOfRoute2.Customers[j];
+
+                            var newRoute1 = ApplyOperatorRemove(cloneOfRoute1, customerInRoute1);
+                            var newRoute2 = ApplyOperatorInsert(cloneOfRoute2, customerInRoute2, customerInRoute1);
+
+                            if (newRoute1 != null && newRoute2 != null)
                             {
-                                if (_solution.Routes[r2].Customers.Count - 1 == j)
-                                    break;
-                                var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
-                                var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
-                                var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
-                                var customerInRoute1 = cloneOfRoute1.Customers[i];
-                                var customerInRoute2 = cloneOfRoute2.Customers[j];
-
-                                var newRoute1 = ApplyOperatorRemove(cloneOfRoute1, customerInRoute1);
-                                var newRoute2 = ApplyOperatorInsert(cloneOfRoute2, customerInRoute2, customerInRoute1);
-
-                                if (newRoute1 != null && newRoute2 != null)
+                                if (newRoute1.Distance + newRoute2.Distance < currentDistance)
                                 {
-                                    if (newRoute1.Distance + newRoute2.Distance < currentDistance)
-                                    {
-                                        _solution.Routes[r1] = newRoute1;
-                                        _solution.Routes[r2] = newRoute2;
-                                        improved = true;
-                                        j = 1;
-                                        i = 1;
-                                        Console.WriteLine("Iteration number: {0}. Improved cost: {1}",
-                                                          iterationCount, _solution.Routes.Sum(r => r.Distance));
-                                        break;
-                                    }
+                                    _solution.Routes[r1] = newRoute1;
+                                    _solution.Routes[r2] = newRoute2;
+                                    _improved = true;
+                                    Console.WriteLine("Iteration number: {0}. Improved cost: {1}",
+                                                      _iterationCount, _solution.Routes.Sum(r => r.Distance));
+                                    return;
                                 }
-
-                                iterationCount++;
                             }
+                            _iterationCount++;
                         }
                     }
                 }
             }
-            _solution.Cost = _solution.Routes.Sum(r => r.Distance);
-            return _solution;
         }
 
         public List<Solution> GenerateFeasibleSolutions()
