@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using VRPTW.Algorithm;
 using VRPTW.Algorithm.Benders;
 using VRPTW.Configuration;

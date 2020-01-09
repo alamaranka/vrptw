@@ -63,7 +63,7 @@ namespace VRPTW.Helper
             return Math.Max(next.TimeStart,
                    previous.ServiceStart +
                    previous.ServiceTime +
-                   Helpers.CalculateDistance(previous, next));
+                   CalculateDistance(previous, next));
         }
 
         public static Route ConstructRoute(List<Customer> customers, double capacity)
@@ -124,10 +124,10 @@ namespace VRPTW.Helper
                 return false;
             }
 
-            var cloneRoute = Helpers.Clone(route);
+            var cloneRoute = Clone(route);
             var customersInNewOrder = cloneRoute.Customers;
             customersInNewOrder.Insert(route.Customers.IndexOf(beforeCustomer), candidate);
-            var constructedRoute = Helpers.ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
+            var constructedRoute = ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
 
             if (constructedRoute == null)
             {
@@ -143,30 +143,30 @@ namespace VRPTW.Helper
             var alpha2 = Config.GetHeuristicsParam().InitialSolutionParam.Alpha2;
             var mu = Config.GetHeuristicsParam().InitialSolutionParam.Mu;
             var lambda = Config.GetHeuristicsParam().InitialSolutionParam.Lambda;
-            var c11 = Helpers.CalculateDistance(previous, candidate) +
-                      Helpers.CalculateDistance(candidate, next) -
-                      Helpers.CalculateDistance(previous, next) * mu;
+            var c11 = CalculateDistance(previous, candidate) +
+                      CalculateDistance(candidate, next) -
+                      CalculateDistance(previous, next) * mu;
             var candidateStartTime = Math.Max(previous.ServiceStart +
                                      previous.ServiceTime +
-                                     Helpers.CalculateDistance(previous, candidate),
+                                     CalculateDistance(previous, candidate),
                                      candidate.TimeStart);
             var c12 = Math.Max(candidateStartTime +
                       candidate.ServiceTime +
-                      Helpers.CalculateDistance(candidate, next),
+                      CalculateDistance(candidate, next),
                       candidate.TimeStart) -
                       next.ServiceStart;
             var c1 = alpha1 * c11 + alpha2 * c12;
 
-            return lambda * Helpers.CalculateDistance(depot, candidate) - c1;
+            return lambda * CalculateDistance(depot, candidate) - c1;
         }
 
         public static Route InsertCustomerToTheRoute(Route route, Customer candidate, Customer next)
         {
-            var cloneRoute = Helpers.Clone(route);
+            var cloneRoute = Clone(route);
             var customersInNewOrder = cloneRoute.Customers;
             customersInNewOrder.Insert(route.Customers.IndexOf(next), candidate);
 
-            return Helpers.ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
+            return ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
         }
     }
 }

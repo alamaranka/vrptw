@@ -23,13 +23,14 @@ namespace VRPTW.Heuristics.LocalSearch
             Console.WriteLine("Applying Relocate Operator. Initial cost: {0}",
                               _solution.Routes.Sum(r => r.Distance));
 
-
             while (_improved)
             {
                 _improved = false;
                 Iterate();
             }
+
             _solution.Cost = _solution.Routes.Sum(r => r.Distance);
+            
             return _solution;
         }
 
@@ -66,6 +67,7 @@ namespace VRPTW.Heuristics.LocalSearch
                                     return;
                                 }
                             }
+
                             _iterationCount++;
                         }
                     }

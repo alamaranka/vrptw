@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Heuristics.LocalSearch;
@@ -25,16 +26,29 @@ namespace VRPTW.Heuristics
             var iterationCount = Config.GetSimulatedAnnealingParam().IterationCount;
             _bestSolution = currentSolution;
 
-            for (var i=0; i<iterationCount; i++)
+            for (var i = 0; i <= iterationCount; i++)
             {
+                
+                if (i % 10 == 0)
+                {
+                    currentSolution = new Diversifier(currentSolution, 5, 10).Diverisfy();
+                }
+
+                var cond = currentSolution.Routes.Any(r => r.Customers.Any(c => c.ServiceStart > c.TimeEnd));
+                if (cond)
+                {
+                    Console.WriteLine(cond);
+                    Console.ReadLine();
+                }
+
                 var solutionPool = new List<Solution>();
-                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions(5));
+                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
-                solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions()); 
+                solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
                 var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
 
                 Console.WriteLine("Iteration: {0}, Temperature: {1}, {2} candidate solutions, current cost: {3}, best cost {4}",
-                                   i, 
+                                   i,
                                    Math.Round(temperature, 3),
                                    solutionPool.Count,
                                    Math.Round(currentSolution.Cost, 3),
@@ -51,16 +65,11 @@ namespace VRPTW.Heuristics
                 if (acceptanceCondition)
                 {
                     currentSolution = Helpers.Clone(candidateSolution);
-                    
+
                     if (currentSolution.Cost < _bestSolution.Cost)
                     {
                         _bestSolution = currentSolution;
                     }
-                }
-
-                if (i % 20 == 0)
-                {
-                    currentSolution = new Diversifier(currentSolution, 10, 20).Diverisfy();
                 }
 
                 temperature *= alpha;
