@@ -18,7 +18,7 @@ namespace VRPTW.Helper
             return Math.Sqrt(term1 + term2);
         }
 
-        [DebuggerStepThrough]
+        //[DebuggerStepThrough]
         public static T Clone<T> (T source)
         {
             if (!typeof(T).IsSerializable)
@@ -66,30 +66,32 @@ namespace VRPTW.Helper
                    CalculateDistance(previous, next));
         }
 
-        public static Route ConstructRoute(List<Customer> customers, double capacity)
+        public static Route ConstructRoute(List<Customer> customers, Route route)
         {
-            var route = new Route()
+            var constructedRoute = new Route()
             {
+                Id = route.Id,
                 Customers = new List<Customer>{ customers[0] },
                 Load = 0.0,
                 Distance = 0.0,
-                Capacity = capacity
+                Capacity = route.Capacity
             };
 
             for (var c = 1; c < customers.Count; c++)
             {
-                route.Customers.Add(customers[c]);
-                route.Customers[c].ServiceStart = CalculateServiceStart(route.Customers[c - 1], route.Customers[c]);
-                route.Load += route.Customers[c].Demand;
-                route.Distance += CalculateDistance(route.Customers[c - 1], route.Customers[c]);
+                constructedRoute.Customers.Add(customers[c]);
+                constructedRoute.Customers[c].ServiceStart = CalculateServiceStart(constructedRoute.Customers[c - 1], constructedRoute.Customers[c]);
+                constructedRoute.Customers[c].RouteId = constructedRoute.Id;
+                constructedRoute.Load += constructedRoute.Customers[c].Demand;
+                constructedRoute.Distance += CalculateDistance(constructedRoute.Customers[c - 1], constructedRoute.Customers[c]);
 
-                if (!IsFeasible(customers[c], route.Load, route.Capacity))
+                if (!IsFeasible(customers[c], constructedRoute.Load, constructedRoute.Capacity))
                 {
                     return null;
                 }
             }
 
-            return route;
+            return constructedRoute;
         }
 
         public static bool IsFeasible(Customer customer, double load, double capacity)
@@ -127,7 +129,7 @@ namespace VRPTW.Helper
             var cloneRoute = Clone(route);
             var customersInNewOrder = cloneRoute.Customers;
             customersInNewOrder.Insert(route.Customers.IndexOf(beforeCustomer), candidate);
-            var constructedRoute = ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
+            var constructedRoute = ConstructRoute(customersInNewOrder, cloneRoute);
 
             if (constructedRoute == null)
             {
@@ -166,7 +168,7 @@ namespace VRPTW.Helper
             var customersInNewOrder = cloneRoute.Customers;
             customersInNewOrder.Insert(route.Customers.IndexOf(next), candidate);
 
-            return ConstructRoute(customersInNewOrder, cloneRoute.Capacity);
+            return ConstructRoute(customersInNewOrder, cloneRoute);
         }
     }
 }

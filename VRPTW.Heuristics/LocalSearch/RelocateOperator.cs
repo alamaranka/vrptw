@@ -118,7 +118,7 @@ namespace VRPTW.Heuristics.LocalSearch
             var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
             customersInNewOrder.Remove(currentInRoute);
 
-            return Helpers.ConstructRoute(customersInNewOrder, route.Capacity);
+            return Helpers.ConstructRoute(customersInNewOrder, route);
         }
 
         private Route ApplyOperatorInsert(Route route, Customer current, Customer candidate)
@@ -128,7 +128,7 @@ namespace VRPTW.Heuristics.LocalSearch
             var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
             customersInNewOrder.Insert(indexOfCurrent, candidate);
 
-            return Helpers.ConstructRoute(customersInNewOrder, route.Capacity);
+            return Helpers.ConstructRoute(customersInNewOrder, route);
         }
     }
 }

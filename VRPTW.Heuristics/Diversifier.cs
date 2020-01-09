@@ -43,6 +43,8 @@ namespace VRPTW.Heuristics
                     allCustomers.Remove(removedCustomer);
                     removedCustomers.Add(removedCustomer);
                     _solution.Routes.Where(r => r.Customers.Contains(removedCustomer)).ToList()
+                        .FirstOrDefault().Load -= removedCustomer.Demand; 
+                    _solution.Routes.Where(r => r.Customers.Contains(removedCustomer)).ToList()
                         .FirstOrDefault().Customers.Remove(removedCustomer);
                 }
                 else

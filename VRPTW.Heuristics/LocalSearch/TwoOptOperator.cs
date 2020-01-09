@@ -101,7 +101,7 @@ namespace VRPTW.Heuristics
             customersInNewOrder.AddRange(ReverseOrder(route, i, j));
             customersInNewOrder.AddRange(route.Customers.GetRange(j + 1, route.Customers.Count - j - 1));
 
-            return Helpers.ConstructRoute(customersInNewOrder, route.Capacity);
+            return Helpers.ConstructRoute(customersInNewOrder, route);
         }
 
         private List<Customer> ReverseOrder(Route route, int i, int j)

@@ -73,7 +73,17 @@ namespace VRPTW.Configuration
                 InitialTemperature = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:InitialTemperature"]),
                 Alpha = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:Alpha"]),
                 IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:IterationCount"])
-            };            
+            };
+        }
+
+        public static DiversificationParam GetDiversificationParam()
+        {
+            return new DiversificationParam()
+            {
+                DiversifyForEachNIteration = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:DiversifyForEachNIteration"]),
+                MinCustomersToRemove = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:MinCustomersToRemove"]),
+                MaxCustomersToRemove = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:MaxCustomersToRemove"])
+            };
         }
     }
 }

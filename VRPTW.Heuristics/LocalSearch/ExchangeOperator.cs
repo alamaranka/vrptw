@@ -124,7 +124,7 @@ namespace VRPTW.Heuristics
             customersInNewOrder.Remove(currentInRoute);
             customersInNewOrder.Insert(indexOfCurrent, candidate);
 
-            return Helpers.ConstructRoute(customersInNewOrder, route.Capacity);
+            return Helpers.ConstructRoute(customersInNewOrder, route);
         }
     }
 }
