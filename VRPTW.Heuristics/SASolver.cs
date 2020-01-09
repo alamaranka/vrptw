@@ -34,13 +34,6 @@ namespace VRPTW.Heuristics
                     currentSolution = new Diversifier(currentSolution, 5, 10).Diverisfy();
                 }
 
-                var cond = currentSolution.Routes.Any(r => r.Customers.Any(c => c.ServiceStart > c.TimeEnd));
-                if (cond)
-                {
-                    Console.WriteLine(cond);
-                    Console.ReadLine();
-                }
-
                 var solutionPool = new List<Solution>();
                 solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
