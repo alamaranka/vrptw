@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
-using System.Linq;
 using VRPTW.Algorithm;
 using VRPTW.Algorithm.Benders;
 using VRPTW.Configuration;
@@ -28,8 +27,6 @@ namespace VRPTW.Runner
                     break;
                 case "HSolver":
                     solution = new HSolver(dataset).Run();
-                    break;
-                default:
                     break;
             }
 
