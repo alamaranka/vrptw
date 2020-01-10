@@ -170,5 +170,10 @@ namespace VRPTW.Helper
 
             return ConstructRoute(customersInNewOrder, cloneRoute);
         }
+
+        public static double GetThresholdForAcceptance(double currentObj, double candidateObj, double currentTemperature)
+        {
+            return 1 / Math.Exp((candidateObj - currentObj) / currentTemperature);
+        }
     }
 }

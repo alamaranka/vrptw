@@ -68,7 +68,7 @@ namespace VRPTW.Algorithm.Benders
 
         private double[,,] GenerateInitialIntegerSolution()
         {
-            var initialSolution = new InitialSolution(_dataset).Get();
+            var initialSolution = new InitialSolution(_dataset).Run();
             return Helpers.ExtractVehicleTraverseFromSolution
                                      (initialSolution, _dataset.Vehicles.Count, _dataset.Vertices.Count);
         }

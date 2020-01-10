@@ -80,7 +80,7 @@ namespace VRPTW.Configuration
         {
             return new DiversificationParam()
             {
-                DiversifyForEachNIteration = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:DiversifyForEachNIteration"]),
+                NumberOfNonImprovingIters = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:NumberOfNonImprovingIters"]),
                 MinCustomersToRemove = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:MinCustomersToRemove"]),
                 MaxCustomersToRemove = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:DiversificationParam:MaxCustomersToRemove"])
             };

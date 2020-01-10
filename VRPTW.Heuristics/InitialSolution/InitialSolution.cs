@@ -24,7 +24,7 @@ namespace VRPTW.Heuristics
             _routeCapacity = _dataset.Vehicles[0].Capacity;
         }
 
-        public Solution Get()
+        public Solution Run()
         {
             SetInputData();
             var routes = new List<Route>();

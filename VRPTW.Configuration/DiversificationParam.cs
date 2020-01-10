@@ -6,7 +6,7 @@ namespace VRPTW.Configuration
 {
     public class DiversificationParam
     {
-        public int DiversifyForEachNIteration { get; set; }
+        public int NumberOfNonImprovingIters { get; set; }
         public int MinCustomersToRemove { get; set; }
         public int MaxCustomersToRemove { get; set; }
     }

@@ -29,9 +29,6 @@ namespace VRPTW.Runner
                 case "HSolver":
                     solution = new HSolver(dataset).Run();
                     break;
-                case "SASolver":
-                    solution = new SASolver(dataset).Run();
-                    break;
                 default:
                     break;
             }
