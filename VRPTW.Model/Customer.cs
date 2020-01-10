@@ -14,5 +14,6 @@ namespace VRPTW.Model
         public int TimeEnd { get; set; }
         public int ServiceTime { get; set; }
         public double ServiceStart { get; set; }
+        public bool IsDepot { get; set; }
     }
 }

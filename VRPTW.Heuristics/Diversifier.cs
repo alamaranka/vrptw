@@ -25,7 +25,7 @@ namespace VRPTW.Heuristics
         {
             var allCustomers = _solution.Routes
                 .SelectMany(c => c.Customers)
-                .Where(p => p.Id != 0 && p.Id != 26)
+                .Where(c => !c.IsDepot)
                 .GroupBy(i => i.Id)
                 .Select(g => g.FirstOrDefault())
                 .ToList();

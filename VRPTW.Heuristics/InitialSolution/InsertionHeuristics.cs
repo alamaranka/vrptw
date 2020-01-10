@@ -62,9 +62,15 @@ namespace VRPTW.Heuristics
 
         private void InitializeRoute()
         {
+            var startingDepot = _depot;
+            var endingDepot = Helpers.Clone(_depot);
+
+            startingDepot.IsDepot = true;
+            endingDepot.IsDepot = true;
+
             _route = new Route()
             {
-                Customers = new List<Customer>() { _depot, Helpers.Clone(_depot) },
+                Customers = new List<Customer>() { startingDepot, endingDepot },
                 Load = 0.0,
                 Distance = 0.0,
                 Capacity = _routeCapacity
