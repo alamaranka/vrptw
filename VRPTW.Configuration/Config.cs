@@ -51,7 +51,10 @@ namespace VRPTW.Configuration
         {
             return new HeuristicsParam()
             {
-                InitialSolutionParam = GetInitialSolutionParam()
+                IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:IterationCount"]),
+                InitialSolutionParam = GetInitialSolutionParam(),
+                SimulatedAnnealingParam = GetSimulatedAnnealingParam(),
+                DiversificationParam = GetDiversificationParam()
             };
         }
 

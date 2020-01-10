@@ -24,14 +24,12 @@ namespace VRPTW.Heuristics
             var stopwatch = Stopwatch.StartNew();
             var totalSecondsElapsed = 0.0;
             var currentSolution = new LSAlgorithm(_dataset).Run();
-            var temperature = Config.GetSimulatedAnnealingParam().InitialTemperature;
-            var alpha = Config.GetSimulatedAnnealingParam().Alpha;
-            var iterationCount = Config.GetSimulatedAnnealingParam().IterationCount;
-            var numberOfNonImprovingIters = Config.GetDiversificationParam().NumberOfNonImprovingIters;
-            var minCustomersToRemove = Config.GetDiversificationParam().MinCustomersToRemove;
-            var maxCustomersToRemove = Config.GetDiversificationParam().MaxCustomersToRemove;
+            var heuristicParams = Config.GetHeuristicsParam();
+            var iterationCount = heuristicParams.IterationCount;
+            var numberOfNonImprovingIters = heuristicParams.DiversificationParam.NumberOfNonImprovingIters;
+            var minCustomersToRemove = heuristicParams.DiversificationParam.MinCustomersToRemove;
+            var maxCustomersToRemove = heuristicParams.DiversificationParam.MaxCustomersToRemove;
             var numberOfNonImprovingItersCounter = 0;
-
 
             _bestSolution = currentSolution;
 
@@ -51,10 +49,9 @@ namespace VRPTW.Heuristics
                 solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
                 var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
 
-                Console.WriteLine("Iteration: {0}, Time Elapsed: {1} sn, Temp: {2}, {3} candidate, Current Cost: {4}, Best Cost {5}",
+                Console.WriteLine("Iteration: {0}, Time Elapsed: {1} sn, {2} candidate, Current Cost: {3}, Best Cost {4}",
                                    i,
                                    totalSecondsElapsed / 1_000.0,
-                                   Math.Round(temperature, 3),
                                    solutionPool.Count,
                                    Math.Round(currentSolution.Cost, 3),
                                    Math.Round(_bestSolution.Cost, 3)
@@ -77,8 +74,6 @@ namespace VRPTW.Heuristics
                 {
                     numberOfNonImprovingItersCounter++;
                 }
-
-                temperature *= alpha;
             }
 
             stopwatch.Stop();
