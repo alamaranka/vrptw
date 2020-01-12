@@ -25,6 +25,7 @@ namespace VRPTW.Heuristics
                 solution = new TwoOptOperator(solution).Apply2OptOperator();
                 solution = new ExchangeOperator(solution).ApplyExchangeOperator();
                 solution = new RelocateOperator(solution).ApplyRelocateOperator();
+                solution = new CrossOperator(solution).ApplyCrossOperator();
 
                 improved |= solution.Cost < cost;
             }

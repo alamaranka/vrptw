@@ -117,7 +117,7 @@ namespace VRPTW.Helper
 
         public static Solution GetBestNeighbour(List<Solution> solutionPool)
         {
-            return solutionPool.OrderByDescending(s => -s.Cost).First();
+            return solutionPool.OrderBy(s => s.Cost).First();
         }
 
         public static bool IsFeasibleToInsert(Route route, Customer candidate, Customer beforeCustomer)

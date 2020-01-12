@@ -32,11 +32,12 @@ namespace VRPTW.Heuristics
             var minCustomersToRemove = heuristicParams.DiversificationParam.MinCustomersToRemove;
             var maxCustomersToRemove = heuristicParams.DiversificationParam.MaxCustomersToRemove;
             var numberOfNonImprovingItersCounter = 0;
+
+            _bestSolution = currentSolution;
+
             var tabuList = new Helpers.FixedSizedQueue<string>(tabuListSize);
             var stringFormOfSolution = Helpers.GetStringFormOfSolution(currentSolution);
-
             tabuList.Enqueue(stringFormOfSolution);
-            _bestSolution = currentSolution;
 
             for (var i = 0; i <= iterationCount; i++)
             {
@@ -62,7 +63,6 @@ namespace VRPTW.Heuristics
                     if (!tabuList.Contains(stringFormOfSolution))
                     {
                         candidateSolution = solutionPool[s];
-                        tabuList.Enqueue(Helpers.GetStringFormOfSolution(candidateSolution));
                         break;
                     }
                 }
@@ -82,6 +82,7 @@ namespace VRPTW.Heuristics
                 if (acceptanceCondition)
                 {
                     currentSolution = Helpers.Clone(candidateSolution);
+                    tabuList.Enqueue(Helpers.GetStringFormOfSolution(candidateSolution));
 
                     if (currentSolution.Cost < _bestSolution.Cost)
                     {
