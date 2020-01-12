@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -18,7 +19,7 @@ namespace VRPTW.Helper
             return Math.Sqrt(term1 + term2);
         }
 
-        //[DebuggerStepThrough]
+        [DebuggerStepThrough]
         public static T Clone<T> (T source)
         {
             if (!typeof(T).IsSerializable)
@@ -174,6 +175,47 @@ namespace VRPTW.Helper
         public static double GetThresholdForAcceptance(double currentObj, double candidateObj, double currentTemperature)
         {
             return 1 / Math.Exp((candidateObj - currentObj) / currentTemperature);
+        }
+
+        public static string GetStringFormOfSolution(Solution solution)
+        {
+            var stringFormOfSolution = "";
+            var numberOfActualRoutes = solution.Routes.Count(r => r.Customers.Count > 2);
+
+            for (int r = 0; r < numberOfActualRoutes; r++)
+            {
+                for (int c = 0; c < solution.Routes[r].Customers.Count - 1; c++)
+                {
+                    stringFormOfSolution += solution.Routes[r].Customers[c].Id;
+                }
+            }
+
+            return stringFormOfSolution;
+        }
+
+        public class FixedSizedQueue<T> : ConcurrentQueue<T>
+        {
+            private readonly object syncObject = new object();
+
+            public int Size { get; private set; }
+
+            public FixedSizedQueue(int size)
+            {
+                Size = size;
+            }
+
+            public new void Enqueue(T obj)
+            {
+                base.Enqueue(obj);
+                lock (syncObject)
+                {
+                    while (base.Count > Size)
+                    {
+                        T outObj;
+                        base.TryDequeue(out outObj);
+                    }
+                }
+            }
         }
     }
 }

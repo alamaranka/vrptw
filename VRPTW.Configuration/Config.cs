@@ -54,6 +54,7 @@ namespace VRPTW.Configuration
                 IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:IterationCount"]),
                 InitialSolutionParam = GetInitialSolutionParam(),
                 SimulatedAnnealingParam = GetSimulatedAnnealingParam(),
+                TabuSearchParam = GetTabuSearchParam(),
                 DiversificationParam = GetDiversificationParam()
             };
         }
@@ -76,6 +77,14 @@ namespace VRPTW.Configuration
                 InitialTemperature = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:InitialTemperature"]),
                 Alpha = Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:Alpha"]),
                 IterationCount = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:SimulatedAnnealingParam:IterationCount"])
+            };
+        }
+
+        public static TabuSearchParam GetTabuSearchParam()
+        {
+            return new TabuSearchParam()
+            {
+                TabuListSize = (int)Convert.ToDouble(ConfigManager.AppSetting["HeuristicsParam:TabuSearchParam:TabuListSize"])
             };
         }
 

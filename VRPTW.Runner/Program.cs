@@ -28,6 +28,9 @@ namespace VRPTW.Runner
                 case "HSolver":
                     solution = new HSolver(dataset).Run();
                     break;
+                case "TSolver":
+                    solution = new TSolver(dataset).Run();
+                    break;
             }
 
             var outputPathString = Config.GetFileOperation().OutputPath +
