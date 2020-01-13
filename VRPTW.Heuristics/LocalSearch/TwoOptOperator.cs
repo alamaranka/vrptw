@@ -55,6 +55,7 @@ namespace VRPTW.Heuristics
                                 _improved = true;
                                 Console.WriteLine("Iteration number: {0}. Improved cost: {1}",
                                                   _iterationCount, _solution.Routes.Sum(r => r.Distance));
+                                return;
                             }
                         }
                         _iterationCount++;

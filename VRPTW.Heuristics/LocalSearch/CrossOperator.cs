@@ -52,11 +52,9 @@ namespace VRPTW.Heuristics
                                     var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
                                     var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
                                     var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
-                                    var customerInRoute1 = cloneOfRoute1.Customers[k];
-                                    var customerInRoute2 = cloneOfRoute2.Customers[m];
 
-                                    var newRoute1 = ApplyOperator(cloneOfRoute1, cloneOfRoute2.Customers.GetRange(k, m - k), i, j);
-                                    var newRoute2 = ApplyOperator(cloneOfRoute2, cloneOfRoute1.Customers.GetRange(i, j - i), k, m);
+                                    var newRoute1 = ApplyOperator(cloneOfRoute1, cloneOfRoute2.Customers.GetRange(k, m - k + 1), i, j);
+                                    var newRoute2 = ApplyOperator(cloneOfRoute2, cloneOfRoute1.Customers.GetRange(i, j - i + 1), k, m);
 
                                     if (newRoute1 != null && newRoute2 != null)
                                     {
@@ -69,6 +67,7 @@ namespace VRPTW.Heuristics
 
                                             Console.WriteLine("Iteration number: {0}. Improved cost: {1}",
                                                               _iterationCount, _solution.Routes.Sum(r => r.Distance));
+                                            return;
                                         }
                                     }
 
@@ -103,11 +102,9 @@ namespace VRPTW.Heuristics
                                     var solution = Helpers.Clone(_solution);
                                     var cloneOfRoute1 = Helpers.Clone(solution.Routes[r1]);
                                     var cloneOfRoute2 = Helpers.Clone(solution.Routes[r2]);
-                                    var customerInRoute1 = cloneOfRoute1.Customers[i];
-                                    var customerInRoute2 = cloneOfRoute2.Customers[j];
 
-                                    var newRoute1 = ApplyOperator(cloneOfRoute1, cloneOfRoute2.Customers.GetRange(k, m - k), i, j);
-                                    var newRoute2 = ApplyOperator(cloneOfRoute2, cloneOfRoute1.Customers.GetRange(i, j - i), k, m);
+                                    var newRoute1 = ApplyOperator(cloneOfRoute1, cloneOfRoute2.Customers.GetRange(k, m - k + 1), i, j);
+                                    var newRoute2 = ApplyOperator(cloneOfRoute2, cloneOfRoute1.Customers.GetRange(i, j - i + 1), k, m);
 
                                     if (newRoute1 != null && newRoute2 != null)
                                     {

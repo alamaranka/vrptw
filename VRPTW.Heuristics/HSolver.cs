@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Heuristics.LocalSearch;
@@ -46,6 +47,7 @@ namespace VRPTW.Heuristics
                 solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
+                solutionPool.AddRange(new CrossOperator(currentSolution).GenerateFeasibleSolutions());
                 var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
 
                 Console.WriteLine("Iteration: {0}, Time Elapsed: {1} sn, {2} candidate, Current Cost: {3}, Best Cost {4}",
