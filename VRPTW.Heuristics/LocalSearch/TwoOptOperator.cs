@@ -36,9 +36,9 @@ namespace VRPTW.Heuristics
 
         private void Iterate()
         {
-            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var numberOfRoutes = _solution.Routes.Count();
 
-            for (var r = 0; r < numberOfActualRoutes - 1; r++)
+            for (var r = 0; r < numberOfRoutes; r++)
             {
                 for (var i = 1; i < _solution.Routes[r].Customers.Count - 2; i++)
                 {
@@ -67,9 +67,9 @@ namespace VRPTW.Heuristics
         public List<Solution> GenerateFeasibleSolutions()
         {
             var solutionPool = new List<Solution>();
-            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var numberOfRoutes = _solution.Routes.Count();
 
-            for (var r = 0; r < numberOfActualRoutes; r++)
+            for (var r = 0; r < numberOfRoutes; r++)
             {
                 for (var i = 1; i < _solution.Routes[r].Customers.Count - 2; i++)
                 {

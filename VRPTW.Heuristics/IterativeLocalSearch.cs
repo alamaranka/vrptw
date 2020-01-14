@@ -9,12 +9,12 @@ using VRPTW.Model;
 
 namespace VRPTW.Heuristics
 {
-    public class HSolver
+    public class IterativeLocalSearch
     {
         private readonly Dataset _dataset;
         private Solution _bestSolution;
 
-        public HSolver(Dataset dataset)
+        public IterativeLocalSearch(Dataset dataset)
         {
             _dataset = dataset;
         }
@@ -44,10 +44,10 @@ namespace VRPTW.Heuristics
                 }
                 
                 var solutionPool = new List<Solution>();
+                solutionPool.AddRange(new CrossOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
-                solutionPool.AddRange(new CrossOperator(currentSolution).GenerateFeasibleSolutions());
                 var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
 
                 Console.WriteLine("Iteration: {0}, Time Elapsed: {1} sn, {2} candidate, Current Cost: {3}, Best Cost {4}",

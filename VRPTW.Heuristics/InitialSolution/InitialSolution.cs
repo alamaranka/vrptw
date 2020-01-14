@@ -38,25 +38,6 @@ namespace VRPTW.Heuristics
                 _unRoutedCustomers = _unRoutedCustomers.Except(route.Customers).ToList();
             }
 
-            var numberOfRemainingVehicles = _dataset.Vehicles.Count - routes.Count;
-            for (var i = 0; i < numberOfRemainingVehicles; i++)
-            {
-                var customers = new List<Customer>
-                {
-                    _depot,
-                    Helpers.Clone(_depot)
-                };
-                var route = new Route()
-                {
-                    Id = routes.Count,
-                    Customers = customers,
-                    Capacity = _routeCapacity,
-                    Load = 0.0,
-                    Distance = 0.0
-                };
-                routes.Add(route);
-            }
-
             ResetReturningDepotName(routes);
 
             var solution = new Solution()

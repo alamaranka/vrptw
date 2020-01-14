@@ -180,9 +180,9 @@ namespace VRPTW.Helper
         public static string GetStringFormOfSolution(Solution solution)
         {
             var stringFormOfSolution = "";
-            var numberOfActualRoutes = solution.Routes.Count(r => r.Customers.Count > 2);
+            var numberOfRoutes = solution.Routes.Count();
 
-            for (int r = 0; r < numberOfActualRoutes; r++)
+            for (int r = 0; r < numberOfRoutes; r++)
             {
                 for (int c = 0; c < solution.Routes[r].Customers.Count - 1; c++)
                 {

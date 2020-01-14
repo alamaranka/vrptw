@@ -35,11 +35,11 @@ namespace VRPTW.Heuristics
 
         private void Iterate()
         {
-            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var numberOfRoutes = _solution.Routes.Count();
 
-            for (var r1 = 0; r1 < numberOfActualRoutes - 1; r1++)
+            for (var r1 = 0; r1 < numberOfRoutes - 1; r1++)
             {
-                for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
+                for (var r2 = r1 + 1; r2 < numberOfRoutes; r2++)
                 {
                     for (var i = 1; i < _solution.Routes[r1].Customers.Count - 2; i++)
                     {
@@ -63,7 +63,7 @@ namespace VRPTW.Heuristics
                                             _solution.Routes[r1] = newRoute1;
                                             _solution.Routes[r2] = newRoute2;
                                             _improved = true;
-                                            numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+                                            numberOfRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
 
                                             Console.WriteLine("Iteration number: {0}. Improved cost: {1}",
                                                               _iterationCount, _solution.Routes.Sum(r => r.Distance));
@@ -80,16 +80,14 @@ namespace VRPTW.Heuristics
             }
         }
 
-        
-
     public List<Solution> GenerateFeasibleSolutions()
         {
             var solutionPool = new List<Solution>();
-            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var numberOfRoutes = _solution.Routes.Count();
 
-            for(var r1 = 0; r1 < numberOfActualRoutes - 1; r1++)
+            for(var r1 = 0; r1 < numberOfRoutes - 1; r1++)
             {
-                for (var r2 = r1 + 1; r2 < numberOfActualRoutes; r2++)
+                for (var r2 = r1 + 1; r2 < numberOfRoutes; r2++)
                 {
                     for (var i = 1; i < _solution.Routes[r1].Customers.Count - 2; i++)
                     {

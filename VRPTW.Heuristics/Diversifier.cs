@@ -57,12 +57,12 @@ namespace VRPTW.Heuristics
 
         private Solution ReInsertRemovedCustomers(List<Customer> customers)
         {
-            var numberOfActualRoutes = _solution.Routes.Where(r => r.Customers.Count > 2).Count();
+            var numberOfRoutes = _solution.Routes.Count();
             var solution = Helpers.Clone(_solution);
 
             while (customers.Count > 0)
             {
-                for (var r = 0; r < numberOfActualRoutes; r++)
+                for (var r = 0; r < numberOfRoutes; r++)
                 {
                     var route = Helpers.Clone(solution.Routes[r]);
 
