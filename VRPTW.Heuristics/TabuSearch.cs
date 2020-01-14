@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using VRPTW.Configuration;
 using VRPTW.Helper;
-using VRPTW.Heuristics.LocalSearch;
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
 {
-    public class TSolver
+    public class TabuSearch
     {
         private readonly Dataset _dataset;
         private Solution _bestSolution;
 
-        public TSolver(Dataset dataset)
+        public TabuSearch(Dataset dataset)
         {
             _dataset = dataset;
         }
@@ -24,7 +22,7 @@ namespace VRPTW.Heuristics
         {
             var stopwatch = Stopwatch.StartNew();
             var totalSecondsElapsed = 0.0;
-            var currentSolution = new LSAlgorithm(_dataset).Run();
+            var currentSolution = new LocalSearch(_dataset).Run();
             var heuristicParams = Config.GetHeuristicsParam();
             var iterationCount = heuristicParams.IterationCount;
             var tabuListSize = heuristicParams.TabuSearchParam.TabuListSize;
@@ -32,12 +30,11 @@ namespace VRPTW.Heuristics
             var minCustomersToRemove = heuristicParams.DiversificationParam.MinCustomersToRemove;
             var maxCustomersToRemove = heuristicParams.DiversificationParam.MaxCustomersToRemove;
             var numberOfNonImprovingItersCounter = 0;
+            var tabuList = new Helpers.FixedSizedQueue<string>(tabuListSize);
 
             _bestSolution = currentSolution;
-
-            var tabuList = new Helpers.FixedSizedQueue<string>(tabuListSize);
-            var stringFormOfSolution = Helpers.GetStringFormOfSolution(currentSolution);
-            tabuList.Enqueue(stringFormOfSolution);
+            currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
+            tabuList.Enqueue(Helpers.GetStringFormOfSolution(currentSolution));
 
             for (var i = 0; i <= iterationCount; i++)
             {
@@ -50,6 +47,7 @@ namespace VRPTW.Heuristics
                 }
 
                 var solutionPool = new List<Solution>();
+                solutionPool.AddRange(new CrossOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
@@ -58,9 +56,7 @@ namespace VRPTW.Heuristics
 
                 for (var s = 0; s < solutionPool.Count; s++)
                 {
-                    stringFormOfSolution = Helpers.GetStringFormOfSolution(solutionPool[s]);
-
-                    if (!tabuList.Contains(stringFormOfSolution))
+                    if (!tabuList.Contains(Helpers.GetStringFormOfSolution(currentSolution)))
                     {
                         candidateSolution = solutionPool[s];
                         break;

@@ -25,11 +25,11 @@ namespace VRPTW.Runner
                 case "BSolver":
                     solution = new BSolver(dataset).Run();
                     break;
-                case "HSolver":
+                case "IterativeLocalSearch":
                     solution = new IterativeLocalSearch(dataset).Run();
                     break;
-                case "TSolver":
-                    solution = new TSolver(dataset).Run();
+                case "TabuSearch":
+                    solution = new TabuSearch(dataset).Run();
                     break;
             }
 

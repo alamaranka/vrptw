@@ -80,7 +80,7 @@ namespace VRPTW.Heuristics
             }
         }
 
-    public List<Solution> GenerateFeasibleSolutions()
+        public List<Solution> GenerateFeasibleSolutions()
         {
             var solutionPool = new List<Solution>();
             var numberOfRoutes = _solution.Routes.Count();

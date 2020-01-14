@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using VRPTW.Helper;
 using VRPTW.Model;
 
-namespace VRPTW.Heuristics.LocalSearch
+namespace VRPTW.Heuristics
 {
     class RelocateOperator
     {

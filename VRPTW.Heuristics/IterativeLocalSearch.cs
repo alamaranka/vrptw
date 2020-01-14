@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using VRPTW.Configuration;
 using VRPTW.Helper;
-using VRPTW.Heuristics.LocalSearch;
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
@@ -23,7 +21,7 @@ namespace VRPTW.Heuristics
         {
             var stopwatch = Stopwatch.StartNew();
             var totalSecondsElapsed = 0.0;
-            var currentSolution = new LSAlgorithm(_dataset).Run();
+            var currentSolution = new LocalSearch(_dataset).Run();
             var heuristicParams = Config.GetHeuristicsParam();
             var iterationCount = heuristicParams.IterationCount;
             var numberOfNonImprovingIters = heuristicParams.DiversificationParam.NumberOfNonImprovingIters;
@@ -32,6 +30,7 @@ namespace VRPTW.Heuristics
             var numberOfNonImprovingItersCounter = 0;
 
             _bestSolution = currentSolution;
+            currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
 
             for (var i = 0; i <= iterationCount; i++)
             {

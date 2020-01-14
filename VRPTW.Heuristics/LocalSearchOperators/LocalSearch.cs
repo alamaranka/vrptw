@@ -1,13 +1,13 @@
-﻿using VRPTW.Heuristics.LocalSearch;
+﻿
 using VRPTW.Model;
 
 namespace VRPTW.Heuristics
 {
-    public class LSAlgorithm
+    public class LocalSearch
     {
         private readonly Dataset _dataset;
 
-        public LSAlgorithm(Dataset dataset)
+        public LocalSearch(Dataset dataset)
         {
             _dataset = dataset;
         }
@@ -23,8 +23,8 @@ namespace VRPTW.Heuristics
                 var cost = solution.Cost;
 
                 solution = new CrossOperator(solution).ApplyCrossOperator();
-                solution = new TwoOptOperator(solution).Apply2OptOperator();
                 solution = new ExchangeOperator(solution).ApplyExchangeOperator();
+                solution = new TwoOptOperator(solution).Apply2OptOperator();
                 solution = new RelocateOperator(solution).ApplyRelocateOperator();
 
                 improved |= solution.Cost < cost;
