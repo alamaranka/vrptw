@@ -19,7 +19,8 @@ namespace VRPTW.Heuristics
 
         public Solution Run()
         {
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = new Stopwatch();
+            stopwatch.Restart();
             var totalSecondsElapsed = 0.0;
             var currentSolution = new LocalSearch(_dataset).Run();
             var heuristicParams = Config.GetHeuristicsParam();
@@ -32,9 +33,12 @@ namespace VRPTW.Heuristics
             _bestSolution = currentSolution;
             currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
 
+            totalSecondsElapsed += TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds).TotalSeconds;
+            Console.WriteLine("Local search completed in {0} seconds!", Math.Round(totalSecondsElapsed, 3));
+
             for (var i = 0; i <= iterationCount; i++)
             {
-                totalSecondsElapsed += stopwatch.Elapsed.Milliseconds;
+                stopwatch.Restart();
 
                 if (numberOfNonImprovingItersCounter == numberOfNonImprovingIters)
                 {
@@ -48,15 +52,6 @@ namespace VRPTW.Heuristics
                 solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
                 solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
                 var candidateSolution = Helpers.GetBestNeighbour(solutionPool);
-
-                Console.WriteLine("Iteration: {0}, Time Elapsed: {1} sn, {2} candidate, Current Cost: {3}, Best Cost {4}",
-                                   i,
-                                   totalSecondsElapsed / 1_000.0,
-                                   solutionPool.Count,
-                                   Math.Round(currentSolution.Cost, 3),
-                                   Math.Round(_bestSolution.Cost, 3)
-                                   );
-
                 var currentCost = currentSolution.Cost;
                 var candidateCost = candidateSolution.Cost;
                 var acceptanceCondition = candidateCost < currentCost; 
@@ -74,6 +69,16 @@ namespace VRPTW.Heuristics
                 {
                     numberOfNonImprovingItersCounter++;
                 }
+
+                totalSecondsElapsed += TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds).TotalSeconds;
+
+                Console.WriteLine("Iteration: {0}, Time Elapsed: {1} sn, {2} candidate, Current Cost: {3}, Best Cost {4}",
+                                   i,
+                                   Math.Round(totalSecondsElapsed, 3),
+                                   solutionPool.Count,
+                                   Math.Round(currentSolution.Cost, 3),
+                                   Math.Round(_bestSolution.Cost, 3)
+                                   );
             }
 
             stopwatch.Stop();
