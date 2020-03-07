@@ -19,10 +19,10 @@ namespace VRPTW.Runner
 
             switch (Config.GetSolverType())
             {
-                case "GSolver":
+                case "GurobiSolver":
                     solution = new GSolver(dataset).Run();
                     break;
-                case "BSolver":
+                case "BendersSolver":
                     solution = new BSolver(dataset).Run();
                     break;
                 case "IterativeLocalSearch":
