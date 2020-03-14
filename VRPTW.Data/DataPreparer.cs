@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using VRPTW.Model;
+using VRPTW.DTO;
+using VRPTW.Data;
 
 namespace VRPTW.Data
 {
@@ -15,7 +16,9 @@ namespace VRPTW.Data
         public Dataset GetCustomerAndVehicleData()
         {
             var vertices = new List<Customer>();
-            var vehicles = new List<Vehicle>();
+            var vehicles = new List<Data.Vehicle>();
+            var distances = new List<Distance>();
+
             switch (_dataSource)
             {
                 case "database":
@@ -28,6 +31,11 @@ namespace VRPTW.Data
                     XMLReader xMLReader = new XMLReader();
                     vertices = xMLReader.GetVertices();
                     vehicles = xMLReader.GetVehicles();
+                    break;
+                case "csv":
+                    CSVReader csvReader = new CSVReader();
+                    vertices = csvReader.GetVertices();
+                    vehicles = csvReader.GetVehicles();
                     break;
                 default:
                     break;

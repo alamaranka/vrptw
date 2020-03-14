@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using VRPTW.Helper;
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Heuristics
 {

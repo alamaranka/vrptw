@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using VRPTW.Helper;
 using VRPTW.Heuristics;
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Algorithm.Benders
 {

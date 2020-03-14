@@ -5,7 +5,7 @@ using VRPTW.Algorithm.Benders;
 using VRPTW.Configuration;
 using VRPTW.Data;
 using VRPTW.Heuristics;
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Runner
 {

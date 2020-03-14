@@ -8,11 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="15.0.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VRPTW.Configuration\VRPTW.Configuration.csproj" />
+    <ProjectReference Include="..\VRPTW.DTO\VRPTW.DTO.csproj" />
+    <ProjectReference Include="..\VRPTW.Helper\VRPTW.Helper.csproj" />
     <ProjectReference Include="..\VRPTW.Model\VRPTW.Model.csproj" />
   </ItemGroup>
 

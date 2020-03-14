@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VRPTW.Configuration;
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Algorithm.Benders
 {

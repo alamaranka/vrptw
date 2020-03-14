@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRPTW.Data", "VRPTW.Data\VRPTW.Data.csproj", "{05343935-FFE9-45A0-AA9D-5B3F495075D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRPTW.Algorithm", "VRPTW.Algorithm\VRPTW.Algorithm.csproj", "{1AA45BC2-B649-420D-8FE1-3EC002483029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRPTW.Algorithm", "VRPTW.Algorithm\VRPTW.Algorithm.csproj", "{1AA45BC2-B649-420D-8FE1-3EC002483029}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRPTW.Model", "VRPTW.Model\VRPTW.Model.csproj", "{4DE037DD-1A72-4B38-AC1F-F9EE68481520}"
 EndProject
@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRPTW.Configuration", "VRPT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRPTW.Heuristics", "VRPTW.Heuristics\VRPTW.Heuristics.csproj", "{78C61E0F-61AD-49F8-B040-CA67401CC933}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRPTW.Entity", "VRPTW.Entity\VRPTW.Entity.csproj", "{6D173C03-FEB1-4467-B64D-EB52EB6CE669}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRPTW.Entity", "VRPTW.Entity\VRPTW.Entity.csproj", "{6D173C03-FEB1-4467-B64D-EB52EB6CE669}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRPTW.DTO", "VRPTW.DTO\VRPTW.DTO.csproj", "{F982A17B-84D3-46EA-9544-2A3375632338}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{6D173C03-FEB1-4467-B64D-EB52EB6CE669}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D173C03-FEB1-4467-B64D-EB52EB6CE669}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D173C03-FEB1-4467-B64D-EB52EB6CE669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F982A17B-84D3-46EA-9544-2A3375632338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F982A17B-84D3-46EA-9544-2A3375632338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F982A17B-84D3-46EA-9544-2A3375632338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F982A17B-84D3-46EA-9544-2A3375632338}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

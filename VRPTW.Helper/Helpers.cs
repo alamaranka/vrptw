@@ -4,23 +4,50 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using VRPTW.Configuration;
-using VRPTW.Model;
+using VRPTW.Data;
+using VRPTW.DTO;
 
 namespace VRPTW.Helper
 {
     public static class Helpers
     {
+        public static List<Distance> GetDistances()
+        {
+            var distances = new List<Distance>();
+
+            using var reader = new StreamReader(Config.GetFileOperation().InstancePath +
+                                                "distances.csv");
+            var header = reader.ReadLine();
+
+            while (!reader.EndOfStream)
+            {
+                var values = reader.ReadLine().Split(';');
+
+                var distance = new Distance()
+                {
+                    LocationCode1 = (int)Convert.ToDouble(values[0]),
+                    LocationCode2 = (int)Convert.ToDouble(values[1]),
+                    Amount = Convert.ToDouble(values[2]),
+                    Speed = Convert.ToDouble(values[3]),
+                };
+
+                distances.Add(distance);
+            }
+
+            return distances;
+        }
+
         public static double CalculateDistance(Customer cStart, Customer cEnd)
         {
-            double term1 = Math.Pow(cStart.Latitude - cEnd.Latitude, 2);
-            double term2 = Math.Pow(cStart.Longitude - cEnd.Longitude, 2);
-            return Math.Sqrt(term1 + term2);
+            return GetDistances()
+                    .Where(t => t.LocationCode1 == cStart.Id && t.LocationCode2 == cEnd.Id)
+                    .Select(t => t.Amount)
+                    .SingleOrDefault();
         }
 
         [DebuggerStepThrough]
-        public static T Clone<T> (T source)
+        public static T Clone<T>(T source)
         {
             if (!typeof(T).IsSerializable)
             {
@@ -32,7 +59,7 @@ namespace VRPTW.Helper
                 return default(T);
             }
 
-            System.Runtime.Serialization.IFormatter formatter = 
+            System.Runtime.Serialization.IFormatter formatter =
                             new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             Stream stream = new MemoryStream();
             using (stream)
@@ -72,7 +99,7 @@ namespace VRPTW.Helper
             var constructedRoute = new Route()
             {
                 Id = route.Id,
-                Customers = new List<Customer>{ customers[0] },
+                Customers = new List<Customer> { customers[0] },
                 Load = 0.0,
                 Distance = 0.0,
                 Capacity = route.Capacity

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using VRPTW.DTO;
 
-namespace VRPTW.Model
+namespace VRPTW.Data
 {
     [Serializable]
     public class Dataset

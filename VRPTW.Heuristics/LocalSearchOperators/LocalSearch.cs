@@ -1,5 +1,5 @@
 ﻿
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Heuristics
 {

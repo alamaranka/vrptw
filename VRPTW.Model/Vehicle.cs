@@ -1,11 +1,12 @@
 ﻿
 using System;
 
-namespace VRPTW.Model
+namespace VRPTW.Data
 {
     [Serializable]
     public class Vehicle
     {
-        public int Capacity { get; set; }
+        public int Id { get; set; }
+        public double Capacity { get; set; }
     }
 }

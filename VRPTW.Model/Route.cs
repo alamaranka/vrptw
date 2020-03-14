@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VRPTW.Model
+namespace VRPTW.Data
 {
     [Serializable]
     public class Route

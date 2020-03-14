@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using VRPTW.Configuration;
 using VRPTW.Helper;
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Heuristics
 {

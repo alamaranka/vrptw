@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using VRPTW.Configuration;
 using VRPTW.Helper;
-using VRPTW.Model;
+using VRPTW.Data;
 
 namespace VRPTW.Heuristics
 {
