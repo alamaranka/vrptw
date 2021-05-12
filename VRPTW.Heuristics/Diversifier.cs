@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using VRPTW.Configuration;
 using VRPTW.Helper;
 using VRPTW.Model;
 
@@ -10,7 +8,7 @@ namespace VRPTW.Heuristics
 {
     public class Diversifier
     {
-        private Solution _solution;
+        private readonly Solution _solution;
         private readonly int _dMin;
         private readonly int _dMax;
 

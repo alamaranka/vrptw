@@ -56,7 +56,7 @@ namespace VRPTW.Heuristics
 
                 for (var s = 0; s < solutionPool.Count; s++)
                 {
-                    if (!tabuList.Contains(Helpers.GetStringFormOfSolution(currentSolution)))
+                    if (!tabuList.Contains(Helpers.GetStringFormOfSolution(solutionPool[s])))
                     {
                         candidateSolution = solutionPool[s];
                         break;
@@ -78,7 +78,6 @@ namespace VRPTW.Heuristics
                 if (acceptanceCondition)
                 {
                     currentSolution = Helpers.Clone(candidateSolution);
-                    tabuList.Enqueue(Helpers.GetStringFormOfSolution(candidateSolution));
 
                     if (currentSolution.Cost < _bestSolution.Cost)
                     {
@@ -89,6 +88,8 @@ namespace VRPTW.Heuristics
                 {
                     numberOfNonImprovingItersCounter++;
                 }
+
+                tabuList.Enqueue(Helpers.GetStringFormOfSolution(candidateSolution));
             }
 
             stopwatch.Stop();
