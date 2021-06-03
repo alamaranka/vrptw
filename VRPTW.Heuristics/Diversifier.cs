@@ -56,13 +56,13 @@ namespace VRPTW.Heuristics
         private Solution ReInsertRemovedCustomers(List<Customer> customers)
         {
             var numberOfRoutes = _solution.Routes.Count();
-            var solution = Helpers.Clone(_solution);
+            var solution = _solution.Clone();
 
             while (customers.Count > 0)
             {
                 for (var r = 0; r < numberOfRoutes; r++)
                 {
-                    var route = Helpers.Clone(solution.Routes[r]);
+                    var route = solution.Routes[r].Clone();
 
                     for (var p = 1; p < route.Customers.Count; p++)
                     {

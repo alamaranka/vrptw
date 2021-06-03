@@ -45,7 +45,7 @@ namespace VRPTW.Heuristics
                     for (var j = i + 1; j < _solution.Routes[r].Customers.Count - 1; j++)
                     {
                         var currentDistance = _solution.Routes[r].Distance;
-                        var newRoute = ApplyOperator(Helpers.Clone(_solution.Routes[r]), i, j);
+                        var newRoute = ApplyOperator(_solution.Routes[r], i, j);
 
                         if (newRoute != null)
                         {
@@ -75,8 +75,9 @@ namespace VRPTW.Heuristics
                 {
                     for (var j = i + 1; j < _solution.Routes[r].Customers.Count - 1; j++)
                     {
-                        var solution = Helpers.Clone(_solution);
-                        var newRoute = ApplyOperator(Helpers.Clone(solution.Routes[r]), i, j);
+                        var solution = _solution.Clone();
+
+                        var newRoute = ApplyOperator(solution.Routes[r], i, j);
 
                         if (newRoute != null)
                         {

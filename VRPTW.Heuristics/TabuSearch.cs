@@ -32,9 +32,13 @@ namespace VRPTW.Heuristics
             var numberOfNonImprovingItersCounter = 0;
             var tabuList = new Helpers.FixedSizedQueue<string>(tabuListSize);
 
-            _bestSolution = currentSolution;
-            currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
+            currentSolution = new Diversifier(currentSolution, 
+                                              minCustomersToRemove, 
+                                              maxCustomersToRemove).Diverisfy();
             tabuList.Enqueue(Helpers.GetStringFormOfSolution(currentSolution));
+            
+            _bestSolution = currentSolution;
+            var candidateSolution = new Solution();
 
             for (var i = 0; i <= iterationCount; i++)
             {
@@ -42,17 +46,11 @@ namespace VRPTW.Heuristics
 
                 if (numberOfNonImprovingItersCounter == numberOfNonImprovingIters)
                 {
-                    currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
+                    currentSolution = new Diversifier(_bestSolution.Clone(), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
                     numberOfNonImprovingItersCounter = 0;
                 }
 
-                var solutionPool = new List<Solution>();
-                solutionPool.AddRange(new CrossOperator(currentSolution).GenerateFeasibleSolutions());
-                solutionPool.AddRange(new TwoOptOperator(currentSolution).GenerateFeasibleSolutions());
-                solutionPool.AddRange(new ExchangeOperator(currentSolution).GenerateFeasibleSolutions());
-                solutionPool.AddRange(new RelocateOperator(currentSolution).GenerateFeasibleSolutions());
-                Solution candidateSolution = new Solution();
-                solutionPool = solutionPool.OrderBy(s => s.Cost).ToList();
+                var solutionPool = CollectNeighbourSolutions(currentSolution);
 
                 for (var s = 0; s < solutionPool.Count; s++)
                 {
@@ -77,7 +75,7 @@ namespace VRPTW.Heuristics
 
                 if (acceptanceCondition)
                 {
-                    currentSolution = Helpers.Clone(candidateSolution);
+                    currentSolution = candidateSolution.Clone();
 
                     if (currentSolution.Cost < _bestSolution.Cost)
                     {
@@ -95,6 +93,18 @@ namespace VRPTW.Heuristics
             stopwatch.Stop();
 
             return _bestSolution;
+        }
+
+        private List<Solution> CollectNeighbourSolutions(Solution solution)
+        {
+            var solutionPool = new List<Solution>();
+
+            solutionPool.AddRange(new CrossOperator(solution).GenerateFeasibleSolutions());
+            solutionPool.AddRange(new TwoOptOperator(solution).GenerateFeasibleSolutions());
+            solutionPool.AddRange(new ExchangeOperator(solution).GenerateFeasibleSolutions());
+            solutionPool.AddRange(new RelocateOperator(solution).GenerateFeasibleSolutions());
+
+            return solutionPool.OrderBy(s => s.Cost).ToList();
         }
     }
 }

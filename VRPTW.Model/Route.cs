@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace VRPTW.Model
 {
     [Serializable]
-    public class Route
+    public class Route : IClonable<Route>
     {
         public int Id { get; set; }
         public Vehicle Vehicle { get; set; }
@@ -12,5 +12,25 @@ namespace VRPTW.Model
         public List<Customer> Customers { get; set; }
         public double Load { get; set; }
         public double Distance { get; set; }
+
+        public Route Clone()
+        {
+            var route = new Route
+            {
+                Id = Id,
+                Vehicle = Vehicle,
+                Capacity = Capacity,
+                Customers = new List<Customer>(),
+                Load = Load,
+                Distance = Distance
+            };
+
+            foreach (var customer in Customers)
+            {
+                route.Customers.Add(customer);
+            }
+
+            return route;
+        }
     }
 }

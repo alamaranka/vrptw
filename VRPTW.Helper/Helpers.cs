@@ -127,7 +127,7 @@ namespace VRPTW.Helper
                 return false;
             }
 
-            var cloneRoute = Clone(route);
+            var cloneRoute = route.Clone();
             var customersInNewOrder = cloneRoute.Customers;
             customersInNewOrder.Insert(route.Customers.IndexOf(beforeCustomer), candidate);
             var constructedRoute = ConstructRoute(customersInNewOrder, cloneRoute);
@@ -165,7 +165,7 @@ namespace VRPTW.Helper
 
         public static Route InsertCustomerToTheRoute(Route route, Customer candidate, Customer next)
         {
-            var cloneRoute = Clone(route);
+            var cloneRoute = route.Clone();
             var customersInNewOrder = cloneRoute.Customers;
             customersInNewOrder.Insert(route.Customers.IndexOf(next), candidate);
 

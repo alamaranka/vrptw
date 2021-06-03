@@ -50,11 +50,9 @@ namespace VRPTW.Heuristics
                                 for (var m = k + 1; m < _solution.Routes[r2].Customers.Count - 1; m++)
                                 {
                                     var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
-                                    var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
-                                    var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
 
-                                    var newRoute1 = ApplyOperator(cloneOfRoute1, cloneOfRoute2.Customers.GetRange(k, m - k + 1), i, j);
-                                    var newRoute2 = ApplyOperator(cloneOfRoute2, cloneOfRoute1.Customers.GetRange(i, j - i + 1), k, m);
+                                    var newRoute1 = ApplyOperator(_solution.Routes[r1], _solution.Routes[r2].Customers.GetRange(k, m - k + 1), i, j);
+                                    var newRoute2 = ApplyOperator(_solution.Routes[r2], _solution.Routes[r1].Customers.GetRange(i, j - i + 1), k, m);
 
                                     if (newRoute1 != null && newRoute2 != null)
                                     {
@@ -97,12 +95,10 @@ namespace VRPTW.Heuristics
                             {
                                 for (var m = k + 1; m < _solution.Routes[r2].Customers.Count - 1; m++)
                                 {
-                                    var solution = Helpers.Clone(_solution);
-                                    var cloneOfRoute1 = Helpers.Clone(solution.Routes[r1]);
-                                    var cloneOfRoute2 = Helpers.Clone(solution.Routes[r2]);
+                                    var solution = _solution.Clone();
 
-                                    var newRoute1 = ApplyOperator(cloneOfRoute1, cloneOfRoute2.Customers.GetRange(k, m - k + 1), i, j);
-                                    var newRoute2 = ApplyOperator(cloneOfRoute2, cloneOfRoute1.Customers.GetRange(i, j - i + 1), k, m);
+                                    var newRoute1 = ApplyOperator(_solution.Routes[r1], _solution.Routes[r2].Customers.GetRange(k, m - k + 1), i, j);
+                                    var newRoute2 = ApplyOperator(_solution.Routes[r2], _solution.Routes[r1].Customers.GetRange(i, j - i + 1), k, m);
 
                                     if (newRoute1 != null && newRoute2 != null)
                                     {

@@ -46,13 +46,11 @@ namespace VRPTW.Heuristics
                         for (var j = 1; j < _solution.Routes[r2].Customers.Count - 1; j++)
                         {
                             var currentDistance = _solution.Routes[r1].Distance + _solution.Routes[r2].Distance;
-                            var cloneOfRoute1 = Helpers.Clone(_solution.Routes[r1]);
-                            var cloneOfRoute2 = Helpers.Clone(_solution.Routes[r2]);
-                            var customerInRoute1 = cloneOfRoute1.Customers[i];
-                            var customerInRoute2 = cloneOfRoute2.Customers[j];
+                            var customerInRoute1 = _solution.Routes[r1].Customers[i];
+                            var customerInRoute2 = _solution.Routes[r2].Customers[j];
 
-                            var newRoute1 = ApplyOperator(cloneOfRoute1, customerInRoute1, customerInRoute2);
-                            var newRoute2 = ApplyOperator(cloneOfRoute2, customerInRoute2, customerInRoute1);
+                            var newRoute1 = ApplyOperator(_solution.Routes[r1], customerInRoute1, customerInRoute2);
+                            var newRoute2 = ApplyOperator(_solution.Routes[r2], customerInRoute2, customerInRoute1);
 
                             if (newRoute1 != null && newRoute2 != null)
                             {
@@ -89,13 +87,13 @@ namespace VRPTW.Heuristics
                     {
                         for (var j = 1; j < _solution.Routes[r2].Customers.Count - 1; j++)
                         {
-                            var solution = Helpers.Clone(_solution);
-                            var cloneOfRoute1 = Helpers.Clone(solution.Routes[r1]);
-                            var cloneOfRoute2 = Helpers.Clone(solution.Routes[r2]);
-                            var customerInRoute1 = cloneOfRoute1.Customers[i];
-                            var customerInRoute2 = cloneOfRoute2.Customers[j];
-                            var newRoute1 = ApplyOperator(cloneOfRoute1, customerInRoute1, customerInRoute2);
-                            var newRoute2 = ApplyOperator(cloneOfRoute2, customerInRoute2, customerInRoute1);
+                            var solution = _solution.Clone();
+
+                            var customerInRoute1 = _solution.Routes[r1].Customers[i];
+                            var customerInRoute2 = _solution.Routes[r2].Customers[j];
+
+                            var newRoute1 = ApplyOperator(_solution.Routes[r1], customerInRoute1, customerInRoute2);
+                            var newRoute2 = ApplyOperator(_solution.Routes[r2], customerInRoute2, customerInRoute1);
 
                             if (newRoute1 != null && newRoute2 != null)
                             {                              
@@ -114,7 +112,7 @@ namespace VRPTW.Heuristics
 
         private Route ApplyOperator(Route route, Customer current, Customer candidate)
         {
-            var customersInNewOrder = route.Customers;
+            var customersInNewOrder = route.Customers.Select(item => item).ToList();
             var currentInRoute = route.Customers.Where(c => c.Id == current.Id).FirstOrDefault();
             var indexOfCurrent = route.Customers.IndexOf(currentInRoute);
 

@@ -31,7 +31,7 @@ namespace VRPTW.Heuristics
             var numberOfNonImprovingItersCounter = 0;
 
             _bestSolution = currentSolution;
-            currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
+            currentSolution = new Diversifier(_bestSolution.Clone(), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
 
             totalSecondsElapsed += TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds).TotalSeconds;
             Console.WriteLine("Local search completed in {0} seconds!", Math.Round(totalSecondsElapsed, 3));
@@ -42,7 +42,7 @@ namespace VRPTW.Heuristics
 
                 if (numberOfNonImprovingItersCounter == numberOfNonImprovingIters)
                 {
-                    currentSolution = new Diversifier(Helpers.Clone(_bestSolution), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
+                    currentSolution = new Diversifier(_bestSolution.Clone(), minCustomersToRemove, maxCustomersToRemove).Diverisfy();
                     numberOfNonImprovingItersCounter = 0;
                 }
                 
@@ -58,7 +58,7 @@ namespace VRPTW.Heuristics
 
                 if (acceptanceCondition)
                 {
-                    currentSolution = Helpers.Clone(candidateSolution);
+                    currentSolution = candidateSolution.Clone();
 
                     if (currentSolution.Cost < _bestSolution.Cost)
                     {
