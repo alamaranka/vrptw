@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace VRPTW.Model
 {
-    [Serializable]
     public class Route : IClonable<Route>
     {
         public int Id { get; set; }
@@ -27,7 +26,7 @@ namespace VRPTW.Model
 
             foreach (var customer in Customers)
             {
-                route.Customers.Add(customer);
+                route.Customers.Add(customer.Clone());
             }
 
             return route;

@@ -19,30 +19,6 @@ namespace VRPTW.Helper
             return Math.Sqrt(term1 + term2);
         }
 
-        [DebuggerStepThrough]
-        public static T Clone<T> (T source)
-        {
-            if (!typeof(T).IsSerializable)
-            {
-                throw new ArgumentException("The type must be serializable.", "source");
-            }
-
-            if (Object.ReferenceEquals(source, null))
-            {
-                return default(T);
-            }
-
-            System.Runtime.Serialization.IFormatter formatter = 
-                            new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-            Stream stream = new MemoryStream();
-            using (stream)
-            {
-                formatter.Serialize(stream, source);
-                stream.Seek(0, SeekOrigin.Begin);
-                return (T)formatter.Deserialize(stream);
-            }
-        }
-
         public static double[,,] ExtractVehicleTraverseFromSolution(Solution solution, int vehicleCount, int verticesCount)
         {
             var vehicleTraverse = new double[vehicleCount, verticesCount + 1, verticesCount + 1];

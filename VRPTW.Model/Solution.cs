@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace VRPTW.Model
 {
-    [Serializable]
     public class Solution : IClonable<Solution>
     {
         public List<Route> Routes { get; set; }
@@ -13,14 +12,14 @@ namespace VRPTW.Model
         {
             var solution = new Solution
             {
+                Cost = Cost,
                 Routes = new List<Route>()
             };
 
             foreach (var route in Routes)
             {
-                solution.Routes.Add(route);
+                solution.Routes.Add(route.Clone());
             }
-            solution.Cost = Cost;
 
             return solution;
         }

@@ -68,7 +68,7 @@ namespace VRPTW.Algorithm
         private void SetInputData()
         {
             _vertices = _dataset.Vertices;
-            _vertices.Add(Helpers.Clone(_vertices[0]));
+            _vertices.Add(_vertices[0].Clone());
             _vehicles = _dataset.Vehicles;
         }
 

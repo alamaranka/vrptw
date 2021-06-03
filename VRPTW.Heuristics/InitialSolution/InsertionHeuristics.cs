@@ -63,7 +63,7 @@ namespace VRPTW.Heuristics
         private void InitializeRoute()
         {
             var startingDepot = _depot;
-            var endingDepot = Helpers.Clone(_depot);
+            var endingDepot = _depot.Clone();
 
             startingDepot.IsDepot = true;
             endingDepot.IsDepot = true;
